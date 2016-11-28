@@ -1,0 +1,113 @@
+.primary-bg-1{
+	    background: #2196f3;
+}
+
+
+#doctor-nav{
+	transform: translateX(0px);
+} 
+
+.panel-title{
+	margin: 0;
+	margin-right: 8px;
+	float:left;
+}
+
+.profile-img{
+	width: 45px;
+    vertical-align: middle;
+}
+
+#doctor-nav{
+	    z-index: 1;
+    top: 64px;
+    width: 270px;
+}
+
+#main-panel{
+	padding-left: 280px;
+}
+
+.styleTable{
+	font-size:14px;
+}
+
+.styleTable td,
+.styleTable th{
+	padding: 5px 8px;
+}
+
+.styleTable .actions{
+	    float: right;
+    width: 100px;
+}
+
+.styleTable .actions i{
+color: #b1b1b1;
+    cursor: pointer;
+    font-size: 16px;
+    vertical-align: top;
+    width: 30px;
+    text-align: center;
+}
+
+.pagination li{
+	width: 30px;
+    font-size: 14px;
+    line-height: 2;
+}
+.pagination li.active{
+	background-color: #64b5f6;
+}
+
+nav .brand-logo{
+	    font-size: 20px;
+}
+
+nav .nav-wrapper{
+	    padding: 0 1em;
+}
+
+.preloader-container{
+	position: absolute;
+    background: #fff;
+    right: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    bottom: 0;
+    z-index: 2;
+}
+
+.preloader-container .preloader-wrapper{
+	left: 50%;
+    top: 50%;
+    margin-left: -32px;
+    margin-top: -32px;
+}
+
+
+.updatePicWrapper{
+	float: left;
+    margin: 0;
+    max-width:200px;
+}
+
+.updatePicWrapper img{
+	width: 100%;
+}
+
+.updatePicWrapper .updatePicFile{
+cursor: pointer;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    width: 100%;
+    opacity: 0;
+    -moz-opacity: 0;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0)
+}
