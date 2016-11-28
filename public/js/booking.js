@@ -164,19 +164,24 @@ function checkDataIsEmpty() {
 	var newBookingValue = firebase.database().ref('booking');
 	newBookingValue.child('schedule').on("value", function(snapshot){
 		//console.log("check data");
-		//console.log(snapshot.val());
+		console.log(snapshot.val());
 		if(snapshot.val() == null) {
-			//console.log("empty");
+			console.log("empty");
 			initialFullCalendar();
 		}
 		else {
 			//console.log("Note Empty");
 			 getFireBaseData();
 		}
+	}, function(err){
+		initialFullCalendar();
+		console.log(err);
 	});
+
+	console.log(newBookingValue.child('schedule'));
 }
 function initialFullCalendar() {
-			var calendar = $('#calendar');
+			calendar = $('#calendar');
 					calendar.fullCalendar({
 
 					header : {
