@@ -111,3 +111,23 @@ cursor: pointer;
     -moz-opacity: 0;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0)
 }
+
+
+.modal-head{
+    float: left;
+    width: 100%;
+    padding: 1em;
+}
+
+.close-modal{
+    color: #ccc;
+    font-stretch: wider;
+    -webkit-transform: scale(1.2,0.8);
+    -moz-transform: scale(1.2,0.8);
+    -ms-transform: scale(1.2,0.8);
+    -o-transform: scale(1.2,0.8);
+    transform: scale(1.2,0.8);
+    display: inline-block;
+    float: right;
+    font-size: 14px;
+}
