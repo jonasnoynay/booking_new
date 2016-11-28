@@ -102,18 +102,47 @@
       	</div>
        	 <div class="input-field col s6">
           <input id="price" type="number" class="validate">
-         <!--  <label for="price">PRICE</label> -->
+        </div>
+       	 <div class="input-field col s6">
+          <input id="duration" type="number" class="validate">
         </div>
         <span id="schedule_error"></span>
-        <div class="input-field col s6">
-          <input id="duration_time" type="time">
-        </div>
 
        <div class="input-field col s6">
             <span id="day"></span>
         </div>
         <div class="input-field col s6">
-          <input id="schedule_time" type="time">
+          <div class="input-field col s4">
+          	 <select>
+	      		<option value="" disabled selected>00</option>
+			      <option value="1">01</option>
+			      <option value="2">02</option>
+			      <option value="3">03</option>
+			      <option value="4">04</option>
+			      <option value="5">05</option>
+			      <option value="6">06</option>
+			      <option value="7">07</option>
+			      <option value="8">08</option>
+			      <option value="9">09</option>
+			      <option value="10">10</option>
+			      <option value="11">11</option>
+			      <option value="12">12</option>
+			    </select>
+		    </div>
+          	   <div class="input-field col s4">
+          	 <select>
+	      		<option value="0" selected>00</option>
+			      <option value="15">15</option>
+			      <option value="30">30</option>
+			      <option value="45">45</option>
+			    </select>
+		    </div>
+		    <div class="input-field col s4">
+		    	<input name="ampm" type="radio" id="am" checked />
+      			<label for="am">AM</label>
+		    	<input name="ampm" type="radio" id="pm" />
+      			<label for="pm">PM</label>
+		    </div>
         </div>
         <div class="input-field col s12">
           <textarea id="notes" class="materialize-textarea" required=""></textarea>
@@ -178,7 +207,23 @@
 						<input type="text" placeholder="Address" id="create_address">
 						<input type="password" placeholder="Password" id="create_password">
 						<input type="password" placeholder="Confirm Password" id="create_confirm_password">
-						<button type="submit" class="waves-effect waves-light btn">Create</button>
+						<p class="error_display"><a href="#">X</a> <span></span></p>
+						<div class="row">
+				      		<button type="submit" class="waves-effect waves-light btn" style="max-width: 180px; width:100%">
+							<div class="preloader-wrapper small">
+						    <div class="spinner-layer spinner-white-only">
+						      <div class="circle-clipper left">
+						        <div class="circle"></div>
+						      </div><div class="gap-patch">
+						        <div class="circle"></div>
+						      </div><div class="circle-clipper right">
+						        <div class="circle"></div>
+						      </div>
+						    </div>
+						  </div>
+						  <span>Submit</span>
+				      		</button>
+				      	</div>
 					</form>
 				</div>
 	      </div>

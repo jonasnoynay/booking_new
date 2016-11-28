@@ -3,6 +3,7 @@ var data = [];
 var bookingSearch = firebase.database().ref('booking');
 var bookingRef = firebase.database().ref('booking');
 var clinicsRef = bookingRef.child("clinics");
+var usersRef = bookingRef.child('users');
 var calendar;
 
 var loginButton = false;
@@ -11,6 +12,9 @@ var lastSelectedStart = null;
 var lastSelectedEnd = null;
 
 firebase.auth().onAuthStateChanged(function(user) {
+
+	console.log('authstatechanged');
+	console.log(user);
 	  if (user) {
 		UI_ID = user.uid;
 	  }else{
@@ -48,9 +52,11 @@ function getClinics() {
 		);
 	var clinics = bookingRef.child('clinics');
 	clinics.on('value', function(snapshot) {
+		//console.log(snapshot.val());
 		snapshot.forEach(function(childSnapshot) {
 			//console.log(childSnapshot.key);
 			var value = childSnapshot.val().name;
+			console.log(value);
 		    $("#clinic").append(
 		      $("<option></option>").attr("value",childSnapshot.key).attr("id","clinic").text(value)
 		    );
@@ -58,8 +64,12 @@ function getClinics() {
 	    	$("select").material_select('update');
 	    	$("select").closest('#input-clinics').children('span.caret').remove();
 		});
+	}, function(err){
+		console.log(err);
 	});
 }
+
+
 function getServices() {
 	//GET THE CLINIC FIRST
 	//$("#services").html(' ')
@@ -108,14 +118,74 @@ function add(price, start_value, end_value, notes, clinic, service, duration_tim
 	 /*var newPostKey = firebase.database().ref().child('posts').push().key;*/
 }
 
+$('#createUser').on('submit', function(e){
+			e.preventDefault();
+			var fullname = $('#create_fullname').val();
+			var email_address = $('#create_email').val();
+			var password = $('#create_password').val();
+			var contact_no = $('#create_contact_no').val();
+			var address = $('#create_address').val();
+			var confirm_password = $('#create_confirm_password').val();
+			if(fullname && email_address && password && password == confirm_password){
+
+				var preloader = $(this).find('[type="submit"]').find('.preloader-wrapper');
+
+				removeError(this);
+
+
+				preloader.addClass('active');
+
+				firebase.auth().createUserWithEmailAndPassword(email_address, password).then(function(error) {
+
+				
+				var user = firebase.auth().currentUser;
+					user.updateProfile({
+						  displayName: fullname
+						}).then(function() {
+
+							var userRef = usersRef.child(user.uid);
+							userRef.set({
+								contact_no : contact_no,
+								address : address,
+								role : "patient"
+							});
+
+							UI_ID = user.uid;
+
+							$('#user_signout').text(user.displayName);
+							$('#login').hide();
+
+						 	$('#loginUser').modal('close');
+							preloader.removeClass('active');
+
+							if(loginButton == false){
+								//console.log('select this please');
+								calendar.fullCalendar('select', lastSelectedStart, lastSelectedEnd);
+							}
+
+						}, function(error) {
+						  console.log(error);
+						});
+				}).catch(function(error){
+						if(error){
+							addError($('#createUser'), error.message);
+						}
+
+						preloader.removeClass('active');
+					});
+
+			}else if(password != confirm_password){
+				addError($('#createUser'), 'Password does not match the confirm password.');
+			}else{
+				addError($('#createUser'), 'Please input the required fields.');
+			}
+
+
+			});
+
 
 $('#loginForm').on('submit', function(e){
 	e.preventDefault();
-
-	/*login_username
-login_password*/
-
-	console.log('loginButton '+loginButton);
 
 	var login_username = $('#login_username').val();
 	var login_password = $('#login_password').val();
@@ -123,6 +193,8 @@ login_password*/
 	if(login_username && login_password){
 
 		var preloader = $(this).find('[type="submit"]').find('.preloader-wrapper');
+
+		removeError(this);
 
 		preloader.addClass('active');
 
@@ -133,7 +205,7 @@ login_password*/
 			preloader.removeClass('active');
 
 			if(loginButton == false){
-				console.log('select this please');
+				//console.log('select this please');
 				calendar.fullCalendar('select', lastSelectedStart, lastSelectedEnd);
 			}
 
@@ -155,8 +227,14 @@ login_password*/
 
 function addError(form, message){
 	console.log(message);
-	form.find('.error_display').addClass('active');
-	form.find('.error_display span').text(message);
+	$(form).find('.error_display').addClass('active');
+	console.log($(form).find('.error_display'));
+	$(form).find('.error_display span').text(message);
+}
+
+function removeError(form){
+	$(form).find('.error_display').removeClass('active');
+	$(form).find('.error_display span').text('');
 }
 
 
@@ -200,7 +278,14 @@ function initialFullCalendar() {
 			        eventLimit: true,
 			        /*events: booking_data,*/
 			        select: function(start, end, jsEvent, view){
-			        	 $('#modal1').modal('open');
+
+
+			        	lastSelectedStart = start;
+						lastSelectedEnd = end;
+
+
+			        	if(UI_ID){
+			        		 $('#modal1').modal('open');
 			        		
 			        	//CHECK IF THE OPTIONS IS CHANGES FOR CLINIC
 			        	$('#clinic').on('change', function(){
@@ -313,6 +398,12 @@ function initialFullCalendar() {
 							$('.modal').modal('close');
 							clear();
 						});
+
+			        	}else{
+			        		loginButton = false;
+			        		console.log('selecta');
+			        		$('#loginUser').modal('open');
+			        	}
 			        },
 			        editable: true,
 			        //function for dragging and dropping
@@ -341,6 +432,8 @@ function initialFullCalendar() {
 			        eventClick: function(event, jsEvent, view, revertFunc) {				   
 			        	/*console.log(event._id);*/
 			        	//console.log(event.title +" "+ event.clinic+" "+event.service);
+
+			        	loginButton = false;
 			        	$('#modal1').modal('open');
 			        	//SET THE TAG IN MODAL
 			        	$('#delete').show();
