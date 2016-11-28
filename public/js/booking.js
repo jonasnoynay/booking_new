@@ -102,8 +102,22 @@ login_password*/
 
 	if(login_username && login_password){
 
+		var preloader = $(this).find('[type="submit"]').find('.preloader-wrapper');
+
+		preloader.addClass('active');
+
 		firebase.auth().signInWithEmailAndPassword(login_username, login_password).then(function(user) {
 			UI_ID = user.uid;
+
+			$('#loginUser').modal('close');
+			preloader.removeClass('active');
+		}).catch(function(error){
+			if(error){
+				$('#loginForm').find('.error_display').addClass('active');
+				$('#loginForm').find('.error_display span').text(error.message)	;
+			}
+
+			preloader.removeClass('active');
 		});
 	}
 

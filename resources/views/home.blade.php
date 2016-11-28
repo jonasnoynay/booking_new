@@ -151,8 +151,22 @@
 					          <label for="login_password">Password</label>
 					        </div>
 				      	</div>
+				      	<p class="error_display"><a href="#">X</a> <span></span></p>
 				      	<div class="row">
-				      		<button type="submit" class="modal-action modal-close waves-effect waves-light btn">Submit</button>
+				      		<button type="submit" class="waves-effect waves-light btn" style="max-width: 180px; width:100%">
+							<div class="preloader-wrapper small">
+						    <div class="spinner-layer spinner-white-only">
+						      <div class="circle-clipper left">
+						        <div class="circle"></div>
+						      </div><div class="gap-patch">
+						        <div class="circle"></div>
+						      </div><div class="circle-clipper right">
+						        <div class="circle"></div>
+						      </div>
+						    </div>
+						  </div>
+						  <span>Submit</span>
+				      		</button>
 				      	</div>
 		            </form>
 		      </div>
@@ -199,6 +213,11 @@ var uid = null;
 	<script type="text/javascript" src="{{ asset('js/fullcalendar.min.js') }}"></script>
 	<script>
 
+
+	$(document).on('click','.error_display a', function(){
+		$(this).parents('.error_display').removeClass('active');
+		$(this).parents('.error_display').find('span').text('');
+	});
 
 	$('#login').on('click', function(){
 		$('#loginUser').modal('open');
