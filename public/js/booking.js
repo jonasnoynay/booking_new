@@ -4,6 +4,20 @@ var bookingSearch = firebase.database().ref('booking');
 var bookingRef = firebase.database().ref('booking');
 var clinicsRef = bookingRef.child("clinics");
 var calendar;
+
+var loginButton = false;
+
+var lastSelectedStart = null;
+var lastSelectedEnd = null;
+
+firebase.auth().onAuthStateChanged(function(user) {
+	  if (user) {
+		UI_ID = user.uid;
+	  }else{
+	  	UI_ID = null;
+	  }
+	});
+
 	$(document).ready(function() {
 		//initialize modal
 		$('.modal').modal();
@@ -21,6 +35,10 @@ var calendar;
 		//getServices();
 	 
 });
+
+$('#login').on('click', function(){
+	loginButton = true;
+})
 
 function getClinics() {
 	$('#clinic').html('');
@@ -97,6 +115,8 @@ $('#loginForm').on('submit', function(e){
 	/*login_username
 login_password*/
 
+	console.log('loginButton '+loginButton);
+
 	var login_username = $('#login_username').val();
 	var login_password = $('#login_password').val();
 
@@ -111,18 +131,33 @@ login_password*/
 
 			$('#loginUser').modal('close');
 			preloader.removeClass('active');
+
+			if(loginButton == false){
+				console.log('select this please');
+				calendar.fullCalendar('select', lastSelectedStart, lastSelectedEnd);
+			}
+
+
 		}).catch(function(error){
 			if(error){
-				$('#loginForm').find('.error_display').addClass('active');
-				$('#loginForm').find('.error_display span').text(error.message)	;
+				addError($('#loginForm'), error.message);
 			}
 
 			preloader.removeClass('active');
 		});
+	}else{
+		addError($('#loginForm'), 'Username/Password required.');
 	}
 
 	//console.log('loginForm');
 });
+
+
+function addError(form, message){
+	console.log(message);
+	form.find('.error_display').addClass('active');
+	form.find('.error_display span').text(message);
+}
 
 
 function checkDataIsEmpty() {
@@ -443,7 +478,7 @@ function settingData(snapshot) {
 				
 				if(booking_data.length == childSize) {
 					//setting the data from firebase
-					var calendar = $('#calendar');
+					calendar = $('#calendar');
 					calendar.fullCalendar({
 			       	header: {
 			       		left: 'title',
@@ -456,6 +491,9 @@ function settingData(snapshot) {
 			        eventLimit: true,
 			        events: booking_data,
 			        select: function(start, end, jsEvent, view){
+
+			        	lastSelectedStart = start;
+						lastSelectedEnd = end;
 
 			        	if(UI_ID){
 			       			$('#modal1').modal('open');
@@ -573,6 +611,8 @@ function settingData(snapshot) {
 							});
 
 			        	}else{
+			        		loginButton = false;
+			        		console.log('selecta');
 			        		$('#loginUser').modal('open');
 			        	}
 			        },
@@ -603,6 +643,8 @@ function settingData(snapshot) {
 			        eventClick: function(event, jsEvent, view, revertFunc) {				   
 			        	/*console.log(event._id);*/
 			        	//console.log(event.title +" "+ event.clinic+" "+event.service);
+
+			        	loginButton = false;
 			        	$('#modal1').modal('open');
 			        	//SET THE TAG IN MODAL
 			        	$('#delete').show();
