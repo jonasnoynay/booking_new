@@ -90,10 +90,7 @@
    		 <label>SERVICES</label> 
       </div>
       	<div class="inupt-field col s12">
-      	<p>
-	      <input type="checkbox" id="allDay" />
-	      <label for="allDay">All Day</label>
-	    </p>
+      	
       	</div>
        	 <div class="input-field col s6">
           <input id="price" type="number" class="validate">
