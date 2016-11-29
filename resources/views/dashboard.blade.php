@@ -136,7 +136,7 @@
 	  if (user) {
 
 	  	firebase.database().ref("booking").child('users').child(user.uid).on('value', function(userSnap){
-	  		if(userSnap.val().role == "patient"){
+	  		if(userSnap.val().role && userSnap.val().role == "patient"){
 	  			window.location.href="/";
 	  		}else{
 
