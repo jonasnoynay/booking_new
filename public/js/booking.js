@@ -12,9 +12,7 @@ var lastSelectedStart = null;
 var lastSelectedEnd = null;
 
 firebase.auth().onAuthStateChanged(function(user) {
-
-	console.log('authstatechanged');
-	console.log(user);
+	
 	  if (user) {
 		UI_ID = user.uid;
 	  }else{

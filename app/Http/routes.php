@@ -12,8 +12,15 @@
 */
 
 Route::get('/', function () {
+    return view('find-clinic');
+});
+
+
+Route::get('/clinic/{name}', function () {
     return view('home');
 });
+
+
 Route::get('/doctor/', function () {
     return view('doctor-login');
 });

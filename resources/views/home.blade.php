@@ -259,6 +259,9 @@ var uid = null;
 	<script>
 
 
+	var search_clinic = "{{ Request::segment(2) }}";
+
+
 	$(document).on('click','.error_display a', function(){
 		$(this).parents('.error_display').removeClass('active');
 		$(this).parents('.error_display').find('span').text('');
