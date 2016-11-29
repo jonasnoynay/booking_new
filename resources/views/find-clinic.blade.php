@@ -102,6 +102,7 @@ var clinicsRef = database.ref("booking").child("clinics");
 		});
 		$('#searchClinicBox').on('focusout', function(e){
 			$('.searchbox').removeClass('active');
+			$('#searchClinicBox').trigger('keyup');
 		});
 
 

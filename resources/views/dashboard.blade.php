@@ -90,7 +90,10 @@
    		 <label>SERVICES</label> 
       </div>
       	<div class="inupt-field col s12">
-      	
+      	<p>
+	      <input type="checkbox" id="allDay" />
+	      <label for="allDay">All Day</label>
+	    </p>
       	</div>
        	 <div class="input-field col s6">
           <input id="price" type="number" class="validate">
@@ -133,7 +136,7 @@
 	  if (user) {
 
 	  	firebase.database().ref("booking").child('users').child(user.uid).on('value', function(userSnap){
-	  		if(userSnap.val().role && userSnap.val().role == "patient"){
+	  		if(typeof userSnap.val().role !== null && userSnap.val().role == "patient"){
 	  			window.location.href="/";
 	  		}else{
 
@@ -150,6 +153,7 @@
 		              console.log(error);
 		            });
 		          }
+	  		}
 
 	  	});
 

@@ -240,7 +240,13 @@ function removeError(form){
 
 function checkDataIsEmpty() {
 	var newBookingValue = firebase.database().ref('booking');
-	newBookingValue.child('schedule').on("value", function(snapshot){
+
+	var theRef = newBookingValue.child('schedule');
+
+	if(typeof filter_clinic !== 'undefined'){
+		theRef = newBookingValue.child('schedule').orderByChild('clinic').equalTo(search_clinic);
+	}
+	theRef.on("value", function(snapshot){
 		//console.log("check data");
 		console.log(snapshot.val());
 		if(snapshot.val() == null) {
@@ -631,7 +637,14 @@ function initialFullCalendar() {
 }
 function getFireBaseData() {
 	//var bookingRef = firebase.database().ref('booking');
-	bookingRef.child('schedule').once('value', settingData);
+
+	var theFireRef = bookingRef.child('schedule');
+
+	if(typeof filter_clinic !== 'undefined'){
+		theFireRef = bookingRef.child('schedule').orderByChild('clinic').equalTo(search_clinic);
+	}
+
+	theFireRef.once('value', settingData);
 }
 
 function settingData(snapshot) {
