@@ -3,6 +3,7 @@ var data = [];
 var bookingSearch = firebase.database().ref('booking');
 var bookingRef = firebase.database().ref('booking');
 var clinicsRef = bookingRef.child("clinics");
+var servicesRef = bookingRef.child("services");
 var usersRef = bookingRef.child('users');
 var calendar;
 
@@ -30,6 +31,7 @@ firebase.auth().onAuthStateChanged(function(user) {
 		//SET THE DATA
 		//GET THE USER CREDENTIAL
 		getClinics();
+		//initialFullCalendar();
 		checkDataIsEmpty();
 
 		//getFireBaseData();
@@ -257,24 +259,19 @@ function checkDataIsEmpty() {
 	console.log(newBookingValue.child('schedule'));
 }
 function initialFullCalendar() {
+
 			calendar = $('#calendar');
 					calendar.fullCalendar({
-
-					header : {
-						left: 'today,month,agendaDay,agendaWeek prev,next',
-						center : 'title',
-						right : ''
-					},
-			       /*	header: {
+			       	header: {
 			       		left: 'title',
 			       		center: '',
 			       		right: 'today,month,agendaDay,agendaWeek prev,next',
-			       	},*/
+			       	},
 			        selectable: true,
 			        selectHelper: true,
 			        editable: true,
 			        eventLimit: true,
-			        /*events: booking_data,*/
+			        //events: booking_data,
 			        select: function(start, end, jsEvent, view){
 
 
@@ -295,12 +292,16 @@ function initialFullCalendar() {
 								snapshot.forEach(function(childSnapshot) {
 									//CHECK THE CLINIC ID
 									//console.log(snapshot.numChildren())
+
 									if(childSnapshot.val().clinic_id == clinic_key) {
 										//console.log("result data name "+childSnapshot.val().price);
 										//adding new select from services
+										//getting the services key
+										//console.log(childSnapshot.key);
+										var services_key = childSnapshot.key;
 										var value = childSnapshot.val().name;
 									    $("#services").append(
-									      $("<option></option>").attr("value",childSnapshot.val().price).attr("id","services").text(value)
+									      $("<option></option>").attr("value", services_key).attr("id","services").attr("price", childSnapshot.val().price).text(value)
 									    );
 									   // Update the content clearing the caret
 								    	$("select").material_select('update');
@@ -312,7 +313,10 @@ function initialFullCalendar() {
 								    	var length = $('#services').children('option').length;
 								    	$('#services').unbind().on('change', function(){
 											var services = $('#services option:selected').text();
-											var price = $('#services option:selected').attr('value');									
+											var price = $('#services option:selected').attr("price");	
+											//alert("calling this arae"+price);
+											//console.log('PRICES'+price);
+											//GETTING THE SELECTED PRICE								
 											$("#price").val(parseInt(price))
 										});
 
@@ -337,7 +341,10 @@ function initialFullCalendar() {
 			        	 	service = $('#services option:selected').text();
 			        	 	duration_time = $('#duration_time').val();
 			        	 	schedule_time = $('#schedule_time').val();
-			        	 	//console.log(service);
+			        	 	
+			        	 	var clinic_key = $('#clinic option:selected').attr('value');			        	 
+			        	 	var services_key = $('#services option:selected').attr('value');
+			        	 	var price_value = $('#services option:selected').attr("price");			  
 			        	 	
 			        	 	price = $("#price").val();
 				        	moment = $('#calendar').fullCalendar('getDate');
@@ -352,8 +359,20 @@ function initialFullCalendar() {
 				        	notes = $('#notes').val();
 				        	end_value = end.format("MM/DD/YYYY");
 				        	//CHECK IF THB NOTES IS NULL
-				        	if(notes.length == 0) {
-				        		//console.log("empty");
+				        	if(notes.length == 0) {				        	
+								Materialize.toast('Empty Notes!', 3000, 'rounded');
+				        	}
+				        	else if(services.length == 0) {
+								Materialize.toast('Empty Services!', 3000, 'rounded');
+				        	}
+				        	else if(price.length == 0) {
+								Materialize.toast('Empty Price!', 3000, 'rounded');
+				        	}
+				        	else if(duration_time.length == 0) {
+								Materialize.toast('Empty Duration Time!', 3000, 'rounded');
+				        	}
+				        	else if(schedule_time.length == 0) {
+								Materialize.toast('Empty schedule Time!', 3000, 'rounded');
 				        	}
 				        	else {
 					            //ADD TO FIREBASE
@@ -381,11 +400,12 @@ function initialFullCalendar() {
 							                service: service,
 							                duration_time: duration_time,
 							                schedule_time: schedule_time,
-							                price: price,
+							                price: price_value,
 							                //id: currentKey
 							            };
 						            $('#calendar').fullCalendar('renderEvent', newEvent,true);
-					            	add(price, start_value, end_value, notes, clinic, service, duration_time, schedule_time);
+						            //ADD TO FIREBASE
+					            	add(price_value, start_value, end_value, notes, clinic_key, services_key, duration_time, schedule_time);
 					            	clear();
 					            	$('.modal').modal('close');
 					            }					           					        
@@ -433,67 +453,115 @@ function initialFullCalendar() {
 
 			        	loginButton = false;
 			        	$('#modal1').modal('open');
-			        	//SET THE TAG IN MODAL
+			        	//SET THE TAG IN MODAL FOR INITIAL LOAD
 			        	$('#delete').show();
 			        	$('#notes').val(event.title);
 						$('#duration_time').val(event.duration_time);
 						$('#schedule_time').val(event.schedule_time);
 						$("#price").val(event.price);
+						//GLOBAL CLINIC_ID
+						var clinic_id = event.clinic;
+						
+						//$('#clinic').html('');
+						//GETING THE VALUE KEY OF CLINIC AND GET THE CLINIC NAME
+						/*console.log("clinic");
+						console.log(event.clinic);*/
+						clinicsRef.child(event.clinic).on("value", function(snapshot) {
+							//console.log(snapshot.val().name);
+							$('#clinic').html('');
+							$clinic = $('#clinic');
+							$clinic.append(
+								//NEED TO ADD THE UI ID
+								$("<option></option>").attr("value",1).attr("id","clinic").attr("ui_key", event.clinic).text(snapshot.val().name)
+							);
+							clinicsRef.on("value", function(snapshot) {
+								snapshot.forEach(function(childSnapshot) {				
+									if(event.clinic != childSnapshot.key) {
+										/*console.log("this is true");
+										console.log(childSnapshot.key);
+										console.log(childSnapshot.val().name);*/
+										//console.log("clinic id"+childSnapshot.key);									
+										$clinic.append($("<option></option>").attr("value", childSnapshot.val().name).attr("id", "clinic").attr("ui_key", childSnapshot.key).attr("key_clinic", childSnapshot.key).text(childSnapshot.val().name));
+										$("select").material_select('update');
+									}
+								});							
+							});
+						});
+						/*------------ SET THE SERVICE OPTION -----------*/			
+						//console.log("SERVICES");
+						var clinic_name;			
+						servicesRef.child(event.service).on("value", function(snapshot) {
+							//console.log(snapshot.val());
+							//console.log("the value"+snapshot.val().name);
+							clinic_name = snapshot.val().name;
+							//APPEND THE FIRST DATA TO SELCT 
+							$('#services').html('');
+							//SET THE SERVICES UI ID
+							$('#services').append($("<option></option>").attr("value",1).attr("id","services").attr("services_ui_key", event.services).text(snapshot.val().name));
+							//GET ALL SERIVECES
+							servicesRef.on("value", function(snapshot) {
+								snapshot.forEach(function(childSnapshot) {
+									if(clinic_name != childSnapshot.val().name) {										
+										//console.log("service key"+childSnapshot.val().name);
+										$('#services').append($("<option></option>").attr("value", childSnapshot.val().name).attr("id", "services").attr("price", childSnapshot.val().price).attr("service_id", childSnapshot.val().key).text(childSnapshot.val().name));
+										$("select").material_select('update');
+									}
+								});
+
+							});
+							//$("#price").val(parseInt(snapshot.val().price));
+							/*$("select").material_select('update');*/
+						});
+						//GETING THE VALUE KEY OF SERVICE
 						//* START FUNCTION FOR SELECT *//
 						//CHECK IF THE OPTIONS IS CHANGES FOR CLINIC
 			        	$('#clinic').on('change', function(){
 			        		var clinic_key = $('#clinic option:selected').attr('value');
-			        		//GET THE SERVICES REREFENCE ID FOR CLINIC
-			        		$('#services').html('');
-			        		var services = bookingRef.child('services');
-							services.on('value', function(snapshot){
-								snapshot.forEach(function(childSnapshot) {
-									//CHECK THE CLINIC ID
-									//console.log(snapshot.numChildren())
-									if(childSnapshot.val().clinic_id == clinic_key) {
-										//console.log("result data name "+childSnapshot.val().price);
-										//alert("Equal me");
-										
-										//adding new select from services
-										var value = childSnapshot.val().name;
-									    $("#services").append(
-									      $("<option></option>").attr("value",childSnapshot.val().price).attr("id","services").text(value)
-									    );
-									   // Update the content clearing the caret
-								    	$("select").material_select('update');
-								    	$("select").closest('#input-services').children('span.caret').remove();
-								    	//SEETING THE PRICE
-								    	$("#price").val(parseInt(childSnapshot.val().price))
-								    	//SETTING THE ON CHANGE FOR SERVICES SELECT
-								    	var length = $('#services').children('option').length;
-								    	$('#services').unbind().on('change', function(){
-											var services = $('#services option:selected').text();
-											var price = $('#services option:selected').attr('value');									
-											$("#price").val(parseInt(price))
-										});
-
-									}
-									else {
-										//CLEAR THE OPTION SELECT
-										$("select").material_select('update');
-								    	$("select").closest('#input-services').children('span.caret').remove();
-										//console.log("Not Data");
-									}										
-								});
-								//console.log(snapshot.val());
-							});
+			        		var ui_key = $('#clinic option:selected').attr('ui_key');
+			        		var key_clinic = $('#clinic option:selected').attr('key_clinic');
+			        		var value_key = $('#clinic option:selected').text();
+			        		var clinic_id;
+			        		console.log(ui_key+"result data");
+			        		console.log("result key"+value_key);
 			        		
+
+			        		//console.log("clinic id"+ui_key);
+			        		$('#services').html('');
+			        		servicesRef.on("value", function(snapshot){
+			        			snapshot.forEach(function(childSnapshot) {
+			        				if(ui_key == childSnapshot.val().clinic_id) {
+			        					//console.log("iu key"+ui_key+" snapshot key"+childSnapshot.clinic_id);
+			        					//console.log(childSnapshot.val().name);
+			        					$('#services').append($("<option></option>").attr("value", childSnapshot.val().name).attr("id", "services").attr("service_id", childSnapshot.val().key).attr("price", childSnapshot.val().price).text(childSnapshot.val().name));
+										$("select").material_select('update');
+										//NEED TO SET THE PRICE FIRST CHILD
+										//console.log(childSnapshot.val().price);
+			        				}
+			        			});
+			        		});	
+			        	});
+			        	//SERVICES ONCHANGE FUNCTION
+			        	$('#services').on('change', function(){
+			        		//SET THE PRICE
+			        		var services_price = $('#services option:selected').attr('price');
+			        		//edit this area
+			        		var service_id = $('#services option:selected').attr('service_id');
+			        		//console.log("Hello services_price"+services_price);
+			        		console.log("SERVICES_ID"+ service_id);
+			        		$("#price").val(parseInt(services_price));
+			        		//alert(services_price);
 			        	});
 						//* END FOR FUNCTION SELECT*//
 						//NEED TO MODIFY
 						//$('#clinic option:selected').text(2);
 			        	//$('#services option:selected').text(2);
 			        	//GETTING THE VALUE AND THE SUBMIT BUTTON FOR UPDATE
-			        	$('#submit').unbind().click(function(){
-			        		var price, moment, start_value, end_value, notes, clinic, service, duration_time, schedule_time, allDay, currentKey, original_title;
+			        	$('#submit').unbind().on("click",function(){
+			        		var price, moment, start_value, end_value, notes, clinic, service, duration_time, schedule_time, allDay, currentKey, original_title, clinic_id;
 			        		original_title = event.title;
 			        		clinic = $('#clinic option:selected').text();
 			        	 	service = $('#services option:selected').text();
+			        	 	clinic_id = $('#clinic option:selected').attr('ui_key');
 			        	 	duration_time = $('#duration_time').val();
 			        	 	schedule_time = $('#schedule_time').val();
 			        	 	price = $("#price").val();
@@ -501,8 +569,10 @@ function initialFullCalendar() {
 				        	start_value = event.start.format("MM/DD/YYYY "+duration_time);
 				        	notes = $('#notes').val();
 				        	end_value = event.end.format("MM/DD/YYYY");
-				        	//console.log(clinic+" "+service+" "+duration_time+" "+schedule_time+" "+price+" "+allDay+" "+start_value+" "+notes+" "+end_value);
-				        	//UPDATE FULLCALENDAR DELETE FIRST THEN UPDATE
+				        	var service_id = $('#services option:selected').attr('service_id');
+				        	var clinic_id = $('#clinic option:selected').attr('ui_key');
+							console.log("clinic id"+clinic_id);
+							console.log("services id"+service_id);
 				        	$('#calendar').fullCalendar('removeEvents', event._id);
 				        	//SETTING THE DATA FOR FULLCALENDAR
 				        	var newEvent = {
@@ -520,15 +590,24 @@ function initialFullCalendar() {
 					            };
 				        	$('#calendar').fullCalendar('renderEvent', newEvent,true);
 				        	//UPDATE FIREBASE DATABASE
-				        	revertChanges("", notes, start_value, end_value, clinic, service, duration_time, schedule_time, price, original_title);
+				        	//revertChanges("", notes, start_value, end_value, clinic, service, duration_time, schedule_time, price, original_title);
 				        	clear();
 				        	$('#modal1').modal('close');
 
 			        	});
 						//CANCEL FUNCTION
 						$('#btn_cancel').on('click', function(){
+
+							//$('#clinic').html('');
+							$('.modal').modal('close');
+							$('#clinic').html('');
+								$('#clinic').append($("<option></option>").attr("value",1).attr("id","clinic").text("Select Clinic"));
+								$("select").material_select('update');
+							//clear();
+
 							$('#modal1').modal('close');
 							clear();
+
 						});
 		        	 	
 			        	//DELETE FUNCTION
@@ -548,6 +627,7 @@ function initialFullCalendar() {
 			        	});
 			        }
 			    });
+				
 }
 function getFireBaseData() {
 	//var bookingRef = firebase.database().ref('booking');
@@ -705,6 +785,87 @@ function settingData(snapshot) {
 								$('#modal1').modal('close');
 								clear();
 							});
+			        		
+
+			        	 $('#delete').hide();
+			        	 $('#day').text(start.format("MM/DD/YYYY"));
+			        	
+			        	 $('#submit').unbind().click(function(){
+			        	 	var price, moment, start_value, end_value, notes, clinic, service, duration_time, schedule_time, allDay, currentKey;
+			        	 	clinic = $('#clinic option:selected').text();
+			        	 	service = $('#services option:selected').text();
+			        	 	duration_time = $('#duration_time').val();
+			        	 	schedule_time = $('#schedule_time').val();
+			        	 	
+			        	 	var clinic_key = $('#clinic option:selected').attr('value');			        	 
+			        	 	var services_key = $('#services option:selected').attr('value');
+			        	 	var price_value = $('#services option:selected').attr("price");			  
+			        	 	
+			        	 	price = $("#price").val();
+				        	moment = $('#calendar').fullCalendar('getDate');
+				        	allDay = $('#allDay').val();
+				        	//variable for all day
+				        	//console.log(allDay);
+				        	//console.log(start.format()+"T"+duration_time);
+				        	var start_date = start.format()+"T"+duration_time;
+				        	//START VALUE SETTING TIME
+				        	//start_value = start.format("MM/DD/YYYY hh:mm");
+				        	start_value = start.format("MM/DD/YYYY "+duration_time);
+				        	notes = $('#notes').val();
+				        	end_value = end.format("MM/DD/YYYY");
+				        	//CHECK IF THB NOTES IS NULL
+				        	if(notes.length == 0) {				        	
+								Materialize.toast('Empty Notes!', 3000, 'rounded');
+				        	}
+				        	else if(services.length == 0) {
+								Materialize.toast('Empty Services!', 3000, 'rounded');
+				        	}
+				        	else if(price.length == 0) {
+								Materialize.toast('Empty Price!', 3000, 'rounded');
+				        	}
+				        	else if(duration_time.length == 0) {
+								Materialize.toast('Empty Duration Time!', 3000, 'rounded');
+				        	}
+				        	else if(schedule_time.length == 0) {
+								Materialize.toast('Empty schedule Time!', 3000, 'rounded');
+				        	}
+				        	else {
+					            //ADD TO FIREBASE
+					            //CHECK IF EXIST
+					            //console.log(start_value);
+					            //var result = checkExistBooking("12/07/2016 13:09");	
+					            //var search_value = "12/10/2016 05:55";
+					            //var search_schedule_time = "06:06";	
+					            //var search_value = start_value;
+					            //var search_schedule_time = schedule_time;			           
+					          
+					            var result = checkExistBooking(start_value, schedule_time);
+					            if(result) {
+					            	//alert("Data Already Exist");
+					            	$('#schedule_error').text("No Vacant between"+start_value+" and "+duration_time);
+					            }
+					            else {
+							            var newEvent = {
+							                //start: '2016-11-22T12:30:00',
+							                start: start_value,
+							                end: end_value,
+							                allDay: false,
+							                title: notes,
+							                clinic: clinic,
+							                service: service,
+							                duration_time: duration_time,
+							                schedule_time: schedule_time,
+							                price: price_value,
+							                //id: currentKey
+							            };
+						            $('#calendar').fullCalendar('renderEvent', newEvent,true);
+						            //ADD TO FIREBASE
+					            	add(price_value, start_value, end_value, notes, clinic_key, services_key, duration_time, schedule_time);
+					            	clear();
+					            	$('.modal').modal('close');
+					            }					           					        
+				        	}
+			        	 });
 
 			        	}else{
 			        		loginButton = false;
@@ -742,67 +903,115 @@ function settingData(snapshot) {
 
 			        	loginButton = false;
 			        	$('#modal1').modal('open');
-			        	//SET THE TAG IN MODAL
+			        	//SET THE TAG IN MODAL FOR INITIAL LOAD
 			        	$('#delete').show();
 			        	$('#notes').val(event.title);
 						$('#duration_time').val(event.duration_time);
 						$('#schedule_time').val(event.schedule_time);
 						$("#price").val(event.price);
+						//GLOBAL CLINIC_ID
+						var clinic_id = event.clinic;
+						
+						//$('#clinic').html('');
+						//GETING THE VALUE KEY OF CLINIC AND GET THE CLINIC NAME
+						/*console.log("clinic");
+						console.log(event.clinic);*/
+						clinicsRef.child(event.clinic).on("value", function(snapshot) {
+							//console.log(snapshot.val().name);
+							$('#clinic').html('');
+							$clinic = $('#clinic');
+							$clinic.append(
+								//NEED TO ADD THE UI ID
+								$("<option></option>").attr("value",1).attr("id","clinic").attr("ui_key", event.clinic).text(snapshot.val().name)
+							);
+							clinicsRef.on("value", function(snapshot) {
+								snapshot.forEach(function(childSnapshot) {				
+									if(event.clinic != childSnapshot.key) {
+										/*console.log("this is true");
+										console.log(childSnapshot.key);
+										console.log(childSnapshot.val().name);*/
+										//console.log("clinic id"+childSnapshot.key);									
+										$clinic.append($("<option></option>").attr("value", childSnapshot.val().name).attr("id", "clinic").attr("ui_key", childSnapshot.key).attr("key_clinic", childSnapshot.key).text(childSnapshot.val().name));
+										$("select").material_select('update');
+									}
+								});							
+							});
+						});
+						/*------------ SET THE SERVICE OPTION -----------*/			
+						//console.log("SERVICES");
+						var clinic_name;			
+						servicesRef.child(event.service).on("value", function(snapshot) {
+							//console.log(snapshot.val());
+							//console.log("the value"+snapshot.val().name);
+							clinic_name = snapshot.val().name;
+							//APPEND THE FIRST DATA TO SELCT 
+							$('#services').html('');
+							//SET THE SERVICES UI ID
+							$('#services').append($("<option></option>").attr("value",1).attr("id","services").attr("services_ui_key", event.services).text(snapshot.val().name));
+							//GET ALL SERIVECES
+							servicesRef.on("value", function(snapshot) {
+								snapshot.forEach(function(childSnapshot) {
+									if(clinic_name != childSnapshot.val().name) {										
+										//console.log("service key"+childSnapshot.val().name);
+										$('#services').append($("<option></option>").attr("value", childSnapshot.val().name).attr("id", "services").attr("price", childSnapshot.val().price).attr("service_id", childSnapshot.val().key).text(childSnapshot.val().name));
+										$("select").material_select('update');
+									}
+								});
+
+							});
+							//$("#price").val(parseInt(snapshot.val().price));
+							/*$("select").material_select('update');*/
+						});
+						//GETING THE VALUE KEY OF SERVICE
 						//* START FUNCTION FOR SELECT *//
 						//CHECK IF THE OPTIONS IS CHANGES FOR CLINIC
 			        	$('#clinic').on('change', function(){
 			        		var clinic_key = $('#clinic option:selected').attr('value');
-			        		//GET THE SERVICES REREFENCE ID FOR CLINIC
-			        		$('#services').html('');
-			        		var services = bookingRef.child('services');
-							services.on('value', function(snapshot){
-								snapshot.forEach(function(childSnapshot) {
-									//CHECK THE CLINIC ID
-									//console.log(snapshot.numChildren())
-									if(childSnapshot.val().clinic_id == clinic_key) {
-										//console.log("result data name "+childSnapshot.val().price);
-										//alert("Equal me");
-										
-										//adding new select from services
-										var value = childSnapshot.val().name;
-									    $("#services").append(
-									      $("<option></option>").attr("value",childSnapshot.val().price).attr("id","services").text(value)
-									    );
-									   // Update the content clearing the caret
-								    	$("select").material_select('update');
-								    	$("select").closest('#input-services').children('span.caret').remove();
-								    	//SEETING THE PRICE
-								    	$("#price").val(parseInt(childSnapshot.val().price))
-								    	//SETTING THE ON CHANGE FOR SERVICES SELECT
-								    	var length = $('#services').children('option').length;
-								    	$('#services').unbind().on('change', function(){
-											var services = $('#services option:selected').text();
-											var price = $('#services option:selected').attr('value');									
-											$("#price").val(parseInt(price))
-										});
-
-									}
-									else {
-										//CLEAR THE OPTION SELECT
-										$("select").material_select('update');
-								    	$("select").closest('#input-services').children('span.caret').remove();
-										//console.log("Not Data");
-									}										
-								});
-								//console.log(snapshot.val());
-							});
+			        		var ui_key = $('#clinic option:selected').attr('ui_key');
+			        		var key_clinic = $('#clinic option:selected').attr('key_clinic');
+			        		var value_key = $('#clinic option:selected').text();
+			        		var clinic_id;
+			        		console.log(ui_key+"result data");
+			        		console.log("result key"+value_key);
 			        		
+
+			        		//console.log("clinic id"+ui_key);
+			        		$('#services').html('');
+			        		servicesRef.on("value", function(snapshot){
+			        			snapshot.forEach(function(childSnapshot) {
+			        				if(ui_key == childSnapshot.val().clinic_id) {
+			        					//console.log("iu key"+ui_key+" snapshot key"+childSnapshot.clinic_id);
+			        					//console.log(childSnapshot.val().name);
+			        					$('#services').append($("<option></option>").attr("value", childSnapshot.val().name).attr("id", "services").attr("service_id", childSnapshot.val().key).attr("price", childSnapshot.val().price).text(childSnapshot.val().name));
+										$("select").material_select('update');
+										//NEED TO SET THE PRICE FIRST CHILD
+										//console.log(childSnapshot.val().price);
+			        				}
+			        			});
+			        		});	
+			        	});
+			        	//SERVICES ONCHANGE FUNCTION
+			        	$('#services').on('change', function(){
+			        		//SET THE PRICE
+			        		var services_price = $('#services option:selected').attr('price');
+			        		//edit this area
+			        		var service_id = $('#services option:selected').attr('service_id');
+			        		//console.log("Hello services_price"+services_price);
+			        		console.log("SERVICES_ID"+ service_id);
+			        		$("#price").val(parseInt(services_price));
+			        		//alert(services_price);
 			        	});
 						//* END FOR FUNCTION SELECT*//
 						//NEED TO MODIFY
 						//$('#clinic option:selected').text(2);
 			        	//$('#services option:selected').text(2);
 			        	//GETTING THE VALUE AND THE SUBMIT BUTTON FOR UPDATE
-			        	$('#submit').unbind().click(function(){
-			        		var price, moment, start_value, end_value, notes, clinic, service, duration_time, schedule_time, allDay, currentKey, original_title;
+			        	$('#submit').unbind().on("click",function(){
+			        		var price, moment, start_value, end_value, notes, clinic, service, duration_time, schedule_time, allDay, currentKey, original_title, clinic_id;
 			        		original_title = event.title;
 			        		clinic = $('#clinic option:selected').text();
 			        	 	service = $('#services option:selected').text();
+			        	 	clinic_id = $('#clinic option:selected').attr('ui_key');
 			        	 	duration_time = $('#duration_time').val();
 			        	 	schedule_time = $('#schedule_time').val();
 			        	 	price = $("#price").val();
@@ -810,8 +1019,10 @@ function settingData(snapshot) {
 				        	start_value = event.start.format("MM/DD/YYYY "+duration_time);
 				        	notes = $('#notes').val();
 				        	end_value = event.end.format("MM/DD/YYYY");
-				        	//console.log(clinic+" "+service+" "+duration_time+" "+schedule_time+" "+price+" "+allDay+" "+start_value+" "+notes+" "+end_value);
-				        	//UPDATE FULLCALENDAR DELETE FIRST THEN UPDATE
+				        	var service_id = $('#services option:selected').attr('service_id');
+				        	var clinic_id = $('#clinic option:selected').attr('ui_key');
+							console.log("clinic id"+clinic_id);
+							console.log("services id"+service_id);
 				        	$('#calendar').fullCalendar('removeEvents', event._id);
 				        	//SETTING THE DATA FOR FULLCALENDAR
 				        	var newEvent = {
@@ -829,15 +1040,19 @@ function settingData(snapshot) {
 					            };
 				        	$('#calendar').fullCalendar('renderEvent', newEvent,true);
 				        	//UPDATE FIREBASE DATABASE
-				        	revertChanges("", notes, start_value, end_value, clinic, service, duration_time, schedule_time, price, original_title);
+				        	//revertChanges("", notes, start_value, end_value, clinic, service, duration_time, schedule_time, price, original_title);
 				        	clear();
 				        	$('.modal').modal('close');
 
 			        	});
 						//CANCEL FUNCTION
 						$('#btn_cancel').on('click', function(){
+							//$('#clinic').html('');
 							$('.modal').modal('close');
-							clear();
+							$('#clinic').html('');
+								$('#clinic').append($("<option></option>").attr("value",1).attr("id","clinic").text("Select Clinic"));
+								$("select").material_select('update');
+							//clear();
 						});
 		        	 	
 			        	//DELETE FUNCTION
