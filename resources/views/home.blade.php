@@ -102,18 +102,47 @@
       	</div>
        	 <div class="input-field col s6">
           <input id="price" type="number" class="validate">
-         <!--  <label for="price">PRICE</label> -->
+        </div>
+       	 <div class="input-field col s6">
+          <input id="duration" type="number" class="validate">
         </div>
         <span id="schedule_error"></span>
-        <div class="input-field col s6">
-          <input id="duration_time" type="time">
-        </div>
 
        <div class="input-field col s6">
             <span id="day"></span>
         </div>
         <div class="input-field col s6">
-          <input id="schedule_time" type="time">
+          <div class="input-field col s4">
+          	 <select>
+	      		<option value="" disabled selected>00</option>
+			      <option value="1">01</option>
+			      <option value="2">02</option>
+			      <option value="3">03</option>
+			      <option value="4">04</option>
+			      <option value="5">05</option>
+			      <option value="6">06</option>
+			      <option value="7">07</option>
+			      <option value="8">08</option>
+			      <option value="9">09</option>
+			      <option value="10">10</option>
+			      <option value="11">11</option>
+			      <option value="12">12</option>
+			    </select>
+		    </div>
+          	   <div class="input-field col s4">
+          	 <select>
+	      		<option value="0" selected>00</option>
+			      <option value="15">15</option>
+			      <option value="30">30</option>
+			      <option value="45">45</option>
+			    </select>
+		    </div>
+		    <div class="input-field col s4">
+		    	<input name="ampm" type="radio" id="am" checked />
+      			<label for="am">AM</label>
+		    	<input name="ampm" type="radio" id="pm" />
+      			<label for="pm">PM</label>
+		    </div>
         </div>
         <div class="input-field col s12">
           <textarea id="notes" class="materialize-textarea" required=""></textarea>
@@ -129,34 +158,79 @@
   </div>
 
   <div id="loginUser" class="modal" style="max-width: 600px;">
-    <form action="" id="addClinicForm">
-    	<div class="modal-content">
-	      <h5>Login</h5>
-	      <div class="row">
-	            <form action="" id="loginForm">
-	            	  <div class="row">
-				        <div class="input-field">
-				          <input id="login_username" type="text" class="validate">
-				          <label for="login_username">Username</label>
-				        </div>
-			      	</div>
-	      			<div class="row">
-				        <div class="input-field">
-				          <input id="login_password" type="password" class="validate">
-				          <label for="login_password">Password</label>
-				        </div>
-			      	</div>
-			      	<div class="row">
-			      		<button type="submit" class="modal-action modal-close waves-effect waves-light btn">Submit</button>
-			      	</div>
-	            </form>
+		<div class="modal-head">
+			<a href="#closeModal" class="close-modal">X</a>
+		</div>
+				<ul class="tabs" style="overflow: hidden;">
+					<li class="tab col s6"><a href="#login_modal">LOGIN</a> </li>
+					<li class="tab col s6"><a href="#new">NEW USER</a></li>
+				</ul>
+	      <div class="modal-content">
+		      	<div class="row" id="login_modal">
+		            <form action="" id="loginForm">
+		            	  <div class="row">
+					        <div class="input-field">
+					          <input id="login_username" type="text" class="validate">
+					          <label for="login_username">Username</label>
+					        </div>
+				      	</div>
+		      			<div class="row">
+					        <div class="input-field">
+					          <input id="login_password" type="password" class="validate">
+					          <label for="login_password">Password</label>
+					        </div>
+				      	</div>
+				      	<p class="error_display"><a href="#">X</a> <span></span></p>
+				      	<div class="row">
+				      		<button type="submit" class="waves-effect waves-light btn" style="max-width: 180px; width:100%">
+							<div class="preloader-wrapper small">
+						    <div class="spinner-layer spinner-white-only">
+						      <div class="circle-clipper left">
+						        <div class="circle"></div>
+						      </div><div class="gap-patch">
+						        <div class="circle"></div>
+						      </div><div class="circle-clipper right">
+						        <div class="circle"></div>
+						      </div>
+						    </div>
+						  </div>
+						  <span>Submit</span>
+				      		</button>
+				      	</div>
+		            </form>
+		      </div>
+		      <div id="new" class="row">
+				<form action="" id="createUser">
+					<input type="text" placeholder="Fullname" id="create_fullname">
+						<input type="text" placeholder="Email Address" id="create_email">
+						<input type="text" placeholder="Contact Number" id="create_contact_no">
+						<input type="text" placeholder="Address" id="create_address">
+						<input type="password" placeholder="Password" id="create_password">
+						<input type="password" placeholder="Confirm Password" id="create_confirm_password">
+						<p class="error_display"><a href="#">X</a> <span></span></p>
+						<div class="row">
+				      		<button type="submit" class="waves-effect waves-light btn" style="max-width: 180px; width:100%">
+							<div class="preloader-wrapper small">
+						    <div class="spinner-layer spinner-white-only">
+						      <div class="circle-clipper left">
+						        <div class="circle"></div>
+						      </div><div class="gap-patch">
+						        <div class="circle"></div>
+						      </div><div class="circle-clipper right">
+						        <div class="circle"></div>
+						      </div>
+						    </div>
+						  </div>
+						  <span>Submit</span>
+				      		</button>
+				      	</div>
+					</form>
+				</div>
 	      </div>
-	    </div>
 <!-- 	    <div class="modal-footer">
   <a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Cancel</a>
   <button type="submit" class="modal-action modal-close waves-effect waves-light btn-flat">Submit</button>
 </div> -->
-    </form>
   </div>
 
 
@@ -171,6 +245,7 @@ var uid = null;
 	  if (user) {
 		$('#user_signout').text(user.displayName);
 		uid = user.uid;
+		$('#login').hide();
 	  }else{
 	  	$('#login').show();
 	  }
@@ -182,6 +257,23 @@ var uid = null;
 	<script type="text/javascript" src="{{ asset('js/moment.min.js') }}"></script>
 	<script type="text/javascript" src="{{ asset('js/fullcalendar.min.js') }}"></script>
 	<script>
+
+
+	var search_clinic = "{{ Request::segment(2) }}";
+
+
+	$(document).on('click','.error_display a', function(){
+		$(this).parents('.error_display').removeClass('active');
+		$(this).parents('.error_display').find('span').text('');
+	});
+
+	$('#login').on('click', function(){
+		$('#loginUser').modal('open');
+	});
+
+	$('.close-modal').on('click', function(){
+		$(this).parents('.modal').modal('close');
+	});
 
 	$('#signout').on('click', function(){
 	

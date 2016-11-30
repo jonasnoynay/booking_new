@@ -131,19 +131,24 @@
 <script async="true">
 		firebase.auth().onAuthStateChanged(function(user) {
 	  if (user) {
-	  	$('#user_name').text(user.displayName);
-		$('#user_email').text(user.email);
-		$('#user_signout').text(user.displayName);
 
-		if(user.photoURL){
-          storageRef.child(user.photoURL).getDownloadURL().then(function(url){
-              if(url){
-                  $('#profilePic').attr('src', url);
-                }
-          }).catch(function(error){
-              console.log(error);
-            });
-          }
+	  	firebase.database().ref("booking").child('users').child(user.uid).on('value', function(userSnap){
+	  		$('#user_name').text(user.displayName);
+				$('#user_email').text(user.email);
+				$('#user_signout').text(user.displayName);
+
+				if(user.photoURL){
+		          storageRef.child(user.photoURL).getDownloadURL().then(function(url){
+		              if(url){
+		                  $('#profilePic').attr('src', url);
+		                }
+		          }).catch(function(error){
+		              console.log(error);
+		            });
+		          }
+
+	  	});
+
 
 	  }else{
 	  	window.location.href="/";

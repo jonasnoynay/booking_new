@@ -7,6 +7,19 @@
 <script src="https://www.gstatic.com/firebasejs/3.6.1/firebase.js"></script>
 <script>
   // Initialize Firebase
+ /* var config = {
+    apiKey: "AIzaSyATaM_gG4MxfpNxPHcJ0J1V8o7oh2Di7_A",
+    authDomain: "laravel-firebase-dd443.firebaseapp.com",
+    databaseURL: "https://laravel-firebase-dd443.firebaseio.com",
+    storageBucket: "laravel-firebase-dd443.appspot.com",
+    messagingSenderId: "213828532935"
+  };
+  firebase.initializeApp(config);*/
+
+   // Initialize Firebase
+  
+
+  // Initialize Firebase
   var config = {
     apiKey: "AIzaSyATaM_gG4MxfpNxPHcJ0J1V8o7oh2Di7_A",
     authDomain: "laravel-firebase-dd443.firebaseapp.com",
@@ -15,6 +28,7 @@
     messagingSenderId: "213828532935"
   };
   firebase.initializeApp(config);
+
 </script>
 
 

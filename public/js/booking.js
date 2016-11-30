@@ -4,7 +4,23 @@ var bookingSearch = firebase.database().ref('booking');
 var bookingRef = firebase.database().ref('booking');
 var clinicsRef = bookingRef.child("clinics");
 var servicesRef = bookingRef.child("services");
+var usersRef = bookingRef.child('users');
 var calendar;
+
+var loginButton = false;
+
+var lastSelectedStart = null;
+var lastSelectedEnd = null;
+
+firebase.auth().onAuthStateChanged(function(user) {
+	
+	  if (user) {
+		UI_ID = user.uid;
+	  }else{
+	  	UI_ID = null;
+	  }
+	});
+
 	$(document).ready(function() {
 		//initialize modal
 		$('.modal').modal();
@@ -24,6 +40,10 @@ var calendar;
 	 
 });
 
+$('#login').on('click', function(){
+	loginButton = true;
+})
+
 function getClinics() {
 	$('#clinic').html('');
 	$('#services').html('');
@@ -32,9 +52,11 @@ function getClinics() {
 		);
 	var clinics = bookingRef.child('clinics');
 	clinics.on('value', function(snapshot) {
+		//console.log(snapshot.val());
 		snapshot.forEach(function(childSnapshot) {
 			//console.log(childSnapshot.key);
 			var value = childSnapshot.val().name;
+			console.log(value);
 		    $("#clinic").append(
 		      $("<option></option>").attr("value",childSnapshot.key).attr("id","clinic").text(value)
 		    );
@@ -42,8 +64,12 @@ function getClinics() {
 	    	$("select").material_select('update');
 	    	$("select").closest('#input-clinics').children('span.caret').remove();
 		});
+	}, function(err){
+		console.log(err);
 	});
 }
+
+
 function getServices() {
 	//GET THE CLINIC FIRST
 	//$("#services").html(' ')
@@ -91,23 +117,150 @@ function add(price, start_value, end_value, notes, clinic, service, duration_tim
 	//console.log(newBookingValue.key);
 	 /*var newPostKey = firebase.database().ref().child('posts').push().key;*/
 }
+
+$('#createUser').on('submit', function(e){
+			e.preventDefault();
+			var fullname = $('#create_fullname').val();
+			var email_address = $('#create_email').val();
+			var password = $('#create_password').val();
+			var contact_no = $('#create_contact_no').val();
+			var address = $('#create_address').val();
+			var confirm_password = $('#create_confirm_password').val();
+			if(fullname && email_address && password && password == confirm_password){
+
+				var preloader = $(this).find('[type="submit"]').find('.preloader-wrapper');
+
+				removeError(this);
+
+
+				preloader.addClass('active');
+
+				firebase.auth().createUserWithEmailAndPassword(email_address, password).then(function(error) {
+
+				
+				var user = firebase.auth().currentUser;
+					user.updateProfile({
+						  displayName: fullname
+						}).then(function() {
+
+							var userRef = usersRef.child(user.uid);
+							userRef.set({
+								contact_no : contact_no,
+								address : address,
+								role : "patient"
+							});
+
+							UI_ID = user.uid;
+
+							$('#user_signout').text(user.displayName);
+							$('#login').hide();
+
+						 	$('#loginUser').modal('close');
+							preloader.removeClass('active');
+
+							if(loginButton == false){
+								//console.log('select this please');
+								calendar.fullCalendar('select', lastSelectedStart, lastSelectedEnd);
+							}
+
+						}, function(error) {
+						  console.log(error);
+						});
+				}).catch(function(error){
+						if(error){
+							addError($('#createUser'), error.message);
+						}
+
+						preloader.removeClass('active');
+					});
+
+			}else if(password != confirm_password){
+				addError($('#createUser'), 'Password does not match the confirm password.');
+			}else{
+				addError($('#createUser'), 'Please input the required fields.');
+			}
+
+
+			});
+
+
+$('#loginForm').on('submit', function(e){
+	e.preventDefault();
+
+	var login_username = $('#login_username').val();
+	var login_password = $('#login_password').val();
+
+	if(login_username && login_password){
+
+		var preloader = $(this).find('[type="submit"]').find('.preloader-wrapper');
+
+		removeError(this);
+
+		preloader.addClass('active');
+
+		firebase.auth().signInWithEmailAndPassword(login_username, login_password).then(function(user) {
+			UI_ID = user.uid;
+
+			$('#loginUser').modal('close');
+			preloader.removeClass('active');
+
+			if(loginButton == false){
+				//console.log('select this please');
+				calendar.fullCalendar('select', lastSelectedStart, lastSelectedEnd);
+			}
+
+
+		}).catch(function(error){
+			if(error){
+				addError($('#loginForm'), error.message);
+			}
+
+			preloader.removeClass('active');
+		});
+	}else{
+		addError($('#loginForm'), 'Username/Password required.');
+	}
+
+	//console.log('loginForm');
+});
+
+
+function addError(form, message){
+	console.log(message);
+	$(form).find('.error_display').addClass('active');
+	console.log($(form).find('.error_display'));
+	$(form).find('.error_display span').text(message);
+}
+
+function removeError(form){
+	$(form).find('.error_display').removeClass('active');
+	$(form).find('.error_display span').text('');
+}
+
+
 function checkDataIsEmpty() {
 	var newBookingValue = firebase.database().ref('booking');
 	newBookingValue.child('schedule').on("value", function(snapshot){
 		//console.log("check data");
-		//console.log(snapshot.val());
+		console.log(snapshot.val());
 		if(snapshot.val() == null) {
-			//console.log("empty");
+			console.log("empty");
 			initialFullCalendar();
 		}
 		else {
 			//console.log("Note Empty");
 			 getFireBaseData();
 		}
+	}, function(err){
+		initialFullCalendar();
+		console.log(err);
 	});
+
+	console.log(newBookingValue.child('schedule'));
 }
 function initialFullCalendar() {
-		var calendar = $('#calendar');
+
+			calendar = $('#calendar');
 					calendar.fullCalendar({
 			       	header: {
 			       		left: 'title',
@@ -120,7 +273,14 @@ function initialFullCalendar() {
 			        eventLimit: true,
 			        //events: booking_data,
 			        select: function(start, end, jsEvent, view){
-			        	 $('#modal1').modal('open');
+
+
+			        	lastSelectedStart = start;
+						lastSelectedEnd = end;
+
+
+			        	if(UI_ID){
+			        		 $('#modal1').modal('open');
 			        		
 			        	//CHECK IF THE OPTIONS IS CHANGES FOR CLINIC
 			        	$('#clinic').on('change', function(){
@@ -256,6 +416,12 @@ function initialFullCalendar() {
 							$('.modal').modal('close');
 							clear();
 						});
+
+			        	}else{
+			        		loginButton = false;
+			        		console.log('selecta');
+			        		$('#loginUser').modal('open');
+			        	}
 			        },
 			        editable: true,
 			        //function for dragging and dropping
@@ -284,6 +450,8 @@ function initialFullCalendar() {
 			        eventClick: function(event, jsEvent, view, revertFunc) {				   
 			        	/*console.log(event._id);*/
 			        	//console.log(event.title +" "+ event.clinic+" "+event.service);
+
+			        	loginButton = false;
 			        	$('#modal1').modal('open');
 			        	//SET THE TAG IN MODAL FOR INITIAL LOAD
 			        	$('#delete').show();
@@ -424,17 +592,22 @@ function initialFullCalendar() {
 				        	//UPDATE FIREBASE DATABASE
 				        	//revertChanges("", notes, start_value, end_value, clinic, service, duration_time, schedule_time, price, original_title);
 				        	clear();
-				        	$('.modal').modal('close');
+				        	$('#modal1').modal('close');
 
 			        	});
 						//CANCEL FUNCTION
 						$('#btn_cancel').on('click', function(){
+
 							//$('#clinic').html('');
 							$('.modal').modal('close');
 							$('#clinic').html('');
 								$('#clinic').append($("<option></option>").attr("value",1).attr("id","clinic").text("Select Clinic"));
 								$("select").material_select('update');
 							//clear();
+
+							$('#modal1').modal('close');
+							clear();
+
 						});
 		        	 	
 			        	//DELETE FUNCTION
@@ -449,7 +622,7 @@ function initialFullCalendar() {
 					        	$('#calendar').fullCalendar('removeEvents', event._id);
 					        	removeData(event.id, event.title);
 				        		clear();
-				        		$('.modal').modal('close');
+				        		$('#modal1').modal('close');
 					        }
 			        	});
 			        }
@@ -481,7 +654,7 @@ function settingData(snapshot) {
 				
 				if(booking_data.length == childSize) {
 					//setting the data from firebase
-					var calendar = $('#calendar');
+					calendar = $('#calendar');
 					calendar.fullCalendar({
 			       	header: {
 			       		left: 'title',
@@ -494,58 +667,126 @@ function settingData(snapshot) {
 			        eventLimit: true,
 			        events: booking_data,
 			        select: function(start, end, jsEvent, view){
-			        	 $('#modal1').modal('open');
+
+			        	lastSelectedStart = start;
+						lastSelectedEnd = end;
+
+			        	if(UI_ID){
+			       			$('#modal1').modal('open');
 			        		
-			        	//CHECK IF THE OPTIONS IS CHANGES FOR CLINIC
-			        	$('#clinic').on('change', function(){
-			        		var clinic_key = $('#clinic option:selected').attr('value');
-			        		//GET THE SERVICES REREFENCE ID FOR CLINIC
-			        		$('#services').html('');
-			        		var services = bookingRef.child('services');
-							services.on('value', function(snapshot){
-								snapshot.forEach(function(childSnapshot) {
-									//CHECK THE CLINIC ID
-									//console.log(snapshot.numChildren())
+				        	//CHECK IF THE OPTIONS IS CHANGES FOR CLINIC
+				        	$('#clinic').on('change', function(){
+				        		var clinic_key = $('#clinic option:selected').attr('value');
+				        		//GET THE SERVICES REREFENCE ID FOR CLINIC
+				        		$('#services').html('');
+				        		var services = bookingRef.child('services');
+								services.on('value', function(snapshot){
+									snapshot.forEach(function(childSnapshot) {
+										//CHECK THE CLINIC ID
+										//console.log(snapshot.numChildren())
+										if(childSnapshot.val().clinic_id == clinic_key) {
+											//console.log("result data name "+childSnapshot.val().price);
+											//adding new select from services
+											var value = childSnapshot.val().name;
+										    $("#services").append(
+										      $("<option></option>").attr("value",childSnapshot.val().price).attr("id","services").text(value)
+										    );
+										   // Update the content clearing the caret
+									    	$("select").material_select('update');
+									    	$("select").closest('#input-services').children('span.caret').remove();
+									    	//SEETING THE PRICE NEED TO MODIFY
+									    	$("#price").val(parseInt(childSnapshot.val().price))
+									    	
+									    	//SETTING THE ON CHANGE FOR SERVICES SELECT
+									    	var length = $('#services').children('option').length;
+									    	$('#services').unbind().on('change', function(){
+												var services = $('#services option:selected').text();
+												var price = $('#services option:selected').attr('value');									
+												$("#price").val(parseInt(price))
+											});
 
-									if(childSnapshot.val().clinic_id == clinic_key) {
-										//console.log("result data name "+childSnapshot.val().price);
-										//adding new select from services
-										//getting the services key
-										//console.log(childSnapshot.key);
-										var services_key = childSnapshot.key;
-										var value = childSnapshot.val().name;
-									    $("#services").append(
-									      $("<option></option>").attr("value", services_key).attr("id","services").attr("price", childSnapshot.val().price).text(value)
-									    );
-									   // Update the content clearing the caret
-								    	$("select").material_select('update');
-								    	$("select").closest('#input-services').children('span.caret').remove();
-								    	//SEETING THE PRICE NEED TO MODIFY
-								    	$("#price").val(parseInt(childSnapshot.val().price))
-								    	
-								    	//SETTING THE ON CHANGE FOR SERVICES SELECT
-								    	var length = $('#services').children('option').length;
-								    	$('#services').unbind().on('change', function(){
-											var services = $('#services option:selected').text();
-											var price = $('#services option:selected').attr("price");	
-											//alert("calling this arae"+price);
-											//console.log('PRICES'+price);
-											//GETTING THE SELECTED PRICE								
-											$("#price").val(parseInt(price))
-										});
-
-									}
-									else {
-										//CLEAR THE OPTION SELECT
-										$("select").material_select('update');
-								    	$("select").closest('#input-services').children('span.caret').remove();
-										//console.log("Not Data");
-									}										
+										}
+										else {
+											//CLEAR THE OPTION SELECT
+											$("select").material_select('update');
+									    	$("select").closest('#input-services').children('span.caret').remove();
+											//console.log("Not Data");
+										}										
+									});
+									//console.log(snapshot.val());
 								});
-								//console.log(snapshot.val());
+				        		
+				        	});
+				        	 $('#delete').hide();
+				        	 $('#day').text(start.format("MM/DD/YYYY"));
+				        	
+				        	 $('#submit').unbind().click(function(){
+				        	 	var price, moment, start_value, end_value, notes, clinic, service, duration_time, schedule_time, allDay, currentKey;
+				        	 	clinic = $('#clinic option:selected').text();
+				        	 	service = $('#services option:selected').text();
+				        	 	duration_time = $('#duration_time').val();
+				        	 	schedule_time = $('#schedule_time').val();
+				        	 	//console.log(service);
+				        	 	
+				        	 	price = $("#price").val();
+					        	moment = $('#calendar').fullCalendar('getDate');
+					        	allDay = $('#allDay').val();
+					        	//variable for all day
+					        	//console.log(allDay);
+					        	//console.log(start.format()+"T"+duration_time);
+					        	var start_date = start.format()+"T"+duration_time;
+					        	//START VALUE SETTING TIME
+					        	//start_value = start.format("MM/DD/YYYY hh:mm");
+					        	start_value = start.format("MM/DD/YYYY "+duration_time);
+					        	notes = $('#notes').val();
+					        	end_value = end.format("MM/DD/YYYY");
+					        	//CHECK IF THB NOTES IS NULL
+					        	if(notes.length == 0) {
+					        		//console.log("empty");
+					        	}
+					        	else {
+						            //ADD TO FIREBASE
+						            //CHECK IF EXIST
+						            //console.log(start_value);
+						            //var result = checkExistBooking("12/07/2016 13:09");	
+						            //var search_value = "12/10/2016 05:55";
+						            //var search_schedule_time = "06:06";	
+						            //var search_value = start_value;
+						            //var search_schedule_time = schedule_time;			           
+						          
+						            var result = checkExistBooking(start_value, schedule_time);
+						            if(result) {
+						            	//alert("Data Already Exist");
+						            	$('#schedule_error').text("No Vacant between"+start_value+" and "+duration_time);
+						            }
+						            else {
+								            var newEvent = {
+								                //start: '2016-11-22T12:30:00',
+								                start: start_value,
+								                end: end_value,
+								                allDay: false,
+								                title: notes,
+								                clinic: clinic,
+								                service: service,
+								                duration_time: duration_time,
+								                schedule_time: schedule_time,
+								                price: price,
+								                //id: currentKey
+								            };
+							            $('#calendar').fullCalendar('renderEvent', newEvent,true);
+						            	add(price, start_value, end_value, notes, clinic, service, duration_time, schedule_time);
+						            	clear();
+						            	$('#modal1').modal('close');
+						            }					           					        
+					        	}
+				        	 });
+
+							$('#btn_cancel').on('click', function(){
+								$('#modal1').modal('close');
+								clear();
 							});
 			        		
-			        	});
+
 			        	 $('#delete').hide();
 			        	 $('#day').text(start.format("MM/DD/YYYY"));
 			        	
@@ -626,10 +867,11 @@ function settingData(snapshot) {
 				        	}
 			        	 });
 
-						$('#btn_cancel').on('click', function(){
-							$('.modal').modal('close');
-							clear();
-						});
+			        	}else{
+			        		loginButton = false;
+			        		console.log('selecta');
+			        		$('#loginUser').modal('open');
+			        	}
 			        },
 			        editable: true,
 			        //function for dragging and dropping
@@ -658,6 +900,8 @@ function settingData(snapshot) {
 			        eventClick: function(event, jsEvent, view, revertFunc) {				   
 			        	/*console.log(event._id);*/
 			        	//console.log(event.title +" "+ event.clinic+" "+event.service);
+
+			        	loginButton = false;
 			        	$('#modal1').modal('open');
 			        	//SET THE TAG IN MODAL FOR INITIAL LOAD
 			        	$('#delete').show();

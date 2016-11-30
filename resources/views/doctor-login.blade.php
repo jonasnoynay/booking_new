@@ -35,6 +35,19 @@
 @endsection
 
 
+@section('auth-js')
+
+<script async="true">
+
+var uid = null;
+		firebase.auth().onAuthStateChanged(function(user) {
+	  if (user) {
+	  	window.location.href="/doctor/dashboard";
+	  }
+	});
+</script>
+@endsection
+
 @section('custom-js')
 	<script>
 
