@@ -98,7 +98,7 @@
         </div>
         <span id="schedule_error"></span>
         <div class="input-field col s6">
-          <input id="duration_time" type="time">
+          <input id="duration_time" type="text">
         </div>
 
        <div class="input-field col s6">
