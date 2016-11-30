@@ -239,24 +239,30 @@ function removeError(form){
 
 
 function checkDataIsEmpty() {
-	var newBookingValue = firebase.database().ref('booking');
-	newBookingValue.child('schedule').on("value", function(snapshot){
-		//console.log("check data");
-		//console.log(snapshot.val());
-		if(snapshot.val() == null) {
-			console.log("empty");
-			initialFullCalendar();
-		}
-		else {
-			//console.log("Note Empty");
-			 getFireBaseData();
-		}
-	}, function(err){
-		initialFullCalendar();
-		console.log(err);
-	});
+    var newBookingValue = firebase.database().ref('booking');
 
-	//console.log(newBookingValue.child('schedule'));
+    var theRef = newBookingValue.child('schedule');
+
+    if(typeof filter_clinic !== 'undefined'){
+        theRef = newBookingValue.child('schedule').orderByChild('clinic').equalTo(search_clinic);
+    }
+    theRef.on("value", function(snapshot){
+        //console.log("check data");
+        console.log(snapshot.val());
+        if(snapshot.val() == null) {
+            console.log("empty");
+            initialFullCalendar();
+        }
+        else {
+            //console.log("Note Empty");
+             getFireBaseData();
+        }
+    }, function(err){
+        initialFullCalendar();
+        console.log(err);
+    });
+
+    console.log(newBookingValue.child('schedule'));
 }
 function initialFullCalendar() {
 
@@ -639,11 +645,18 @@ function initialFullCalendar() {
 
 				
 }
-function getFireBaseData() {
-	//var bookingRef = firebase.database().ref('booking');
-	bookingRef.child('schedule').once('value', settingData);
-}
 
+function getFireBaseData() {
+    //var bookingRef = firebase.database().ref('booking');
+
+    var theFireRef = bookingRef.child('schedule');
+
+    if(typeof filter_clinic !== 'undefined'){
+        theFireRef = bookingRef.child('schedule').orderByChild('clinic').equalTo(search_clinic);
+    }
+
+    theFireRef.once('value', settingData);
+}
 function settingData(snapshot) {
 	var childSize = snapshot.numChildren();
 		var booking_data = [];

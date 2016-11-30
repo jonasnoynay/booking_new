@@ -260,6 +260,7 @@ var uid = null;
 
 
 	var search_clinic = "{{ Request::segment(2) }}";
+	var filter_clinic = true;
 
 
 	$(document).on('click','.error_display a', function(){

@@ -93,7 +93,7 @@
       	
       	</div>
        	 <div class="input-field col s6">
-          <input id="price" type="number" class="validate">
+          <input id="price" type="text" class="validate">
          <!--  <label for="price">PRICE</label> -->
         </div>
         <span id="schedule_error"></span>
@@ -133,7 +133,7 @@
 	  if (user) {
 
 	  	firebase.database().ref("booking").child('users').child(user.uid).on('value', function(userSnap){
-	  		$('#user_name').text(user.displayName);
+
 				$('#user_email').text(user.email);
 				$('#user_signout').text(user.displayName);
 

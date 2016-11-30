@@ -20,6 +20,8 @@
   
 
   // Initialize Firebase
+
+
   var config = {
     apiKey: "AIzaSyATaM_gG4MxfpNxPHcJ0J1V8o7oh2Di7_A",
     authDomain: "laravel-firebase-dd443.firebaseapp.com",
@@ -29,7 +31,9 @@
   };
   firebase.initializeApp(config);
 
-</script>
+</script> 
+
+
 
 
     @yield('auth-js')

@@ -21,6 +21,41 @@
 	    margin: auto;
     	display: block;
 	}
+
+	.searchbox{
+		position: absolute;
+	    width: 100%;
+	    top: 45px;
+	    margin: 0;
+	    display: none;
+	}
+	.searchbox.active{
+		display: block;
+	}
+
+	.searchbox li{
+		color:#000;
+	}
+
+	.searchbox li:hover{
+		background: #b2dfdb;
+	}
+
+	.remove{
+		position: absolute;
+    right: 0;
+    top: 0;
+    padding: 2px 10px;
+    font-size: 28px;
+    color: #000;
+    display: none;
+	}
+
+	.remove.active{
+		display: block;
+	}
+
+
 </style>
 @endsection
 
@@ -31,7 +66,16 @@
           <div class="card teal darken-1">
             <div class="card-content white-text">
               <span class="card-title">Search clinic or type address</span>
-     		<input type="text" id="searchClinicBox">
+     		<div style="position:relative">
+     			<input type="text" id="searchClinicBox">
+     			<a href="#" class="remove">X</a>
+	     		<ul class="collection searchbox">
+			     <!--  <li class="collection-item" value="ha">Alvin</li>
+			     <li class="collection-item" value="he">Alvin</li>
+			     <li class="collection-item" value="hi">Alvin</li>
+			     <li class="collection-item" value="ho">Alvin</li> -->
+			    </ul>
+     		</div>
      		<button type="button" class="teal darken-3" id="search">Search</button>
           </div>
         </div>
@@ -41,19 +85,85 @@
 
 @section('custom-js')
 <script>
+
+
+var database = firebase.database();
+
+var clinicsRef = database.ref("booking").child("clinics");
+
 	$(document).on('ready', function(){
 
-		var searchText = "";
+		var clinic_id = "";
+
+		var intervalSearch;
+
+		$('#searchClinicBox').on('focusin', function(){
+			$('.searchbox').addClass('active');
+		});
+		$('#searchClinicBox').on('focusout', function(e){
+			$('.searchbox').removeClass('active');
+			$('#searchClinicBox').trigger('keyup');
+		});
+
+
+		$('.searchbox').on('mousedown', 'li', function(){
+
+			$('#searchClinicBox').val($(this).text());
+
+			clinic_id = $(this).attr('value');
+			
+		});
 
 		$('#searchClinicBox').on('keyup', function(){
-			searchText = $(this).val();
+			var search_val = $(this).val();
+			clearInterval(intervalSearch);
+			if(search_val){
+
+				$('.remove').addClass('active');
+
+				intervalSearch = setTimeout(function(){
+
+					clinicsRef.orderByChild('name')
+	                 .startAt(search_val)
+	                 .endAt(search_val+"\uf8ff")
+	                 .once("value").then(function(snap){
+
+	                 	clearSearch();
+
+	                 	if(snap.val()){
+	                 		snap.forEach(function(childSnap){
+	                 			//console.log(childSnap.val().name);
+	                 			$('.searchbox').append( $('<li>').addClass('collection-item').attr('value', childSnap.key).text(childSnap.val().name) );
+	                 		});
+	                 	}
+	                 });
+				}, 200);
+
+			
+			}else{
+				$('.remove').click();
+				clearSearch();
+			}
+			
+
 		});
+
+		$('.remove').on('click', function(){
+			$('.remove').removeClass('active');
+			$('.searchbox').html('');
+			$('#searchClinicBox').val('');
+			clinic_id = "";
+		});
+
+		function clearSearch(){
+			$('.searchbox').html('');
+		}
 
 		$('#search').on('click', function(){
 
-			if(searchText){
+			if(clinic_id){
 
-				window.location.href="/clinic/"+searchText;
+				window.location.href="/clinic/"+clinic_id;
 			}else{
 				alert('Please input a keyword');
 			}
