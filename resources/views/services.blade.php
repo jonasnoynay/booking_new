@@ -46,6 +46,7 @@
                 <tr>
                     <th data-field="id">Name</th>
                     <th data-field="name">Price</th>
+                    <th data-field="name">Duration</th>
                     <th data-field="name">Clinic</th>
                     <th data-field="action" width="50"></th>
                 </tr>
@@ -94,6 +95,12 @@
                   <label for="service_price">Service Price</label>
                 </div>
               </div>
+              <div class="row">
+                <div class="input-field">
+                  <input id="service_duration" type="number" class="validate">
+                  <label for="service_duration">Service Duration (In Minutes)</label>
+                </div>
+              </div>
         </div>
       </div>
       <div class="modal-footer">
@@ -129,9 +136,16 @@
               <div class="row">
                 <div class="input-field">
                   <input id="edit_service_price" type="text" class="validate">
-                  <label for="edit_service_price" class="active">Service Address</label>
+                  <label for="edit_service_price" class="active">Service Price</label>
                 </div>
               </div>
+              <div class="row">
+                <div class="input-field">
+                  <input id="edit_service_duration" type="number" class="validate">
+                  <label for="edit_service_duration">Service Duration (In Minutes)</label>
+                </div>
+              </div>
+
               <input type="hidden" id="edit_service_id">
         </div>
       </div>
@@ -226,9 +240,10 @@ var uid = null;
           // Get Data
           var service_name = $('#service_name').val();
           var service_price = $('#service_price').val();
+          var service_duration = $('#service_duration').val();
           var clinic_id = $('#addServiceSelectClinic').val();
 
-          if(service_name && service_price && uid && clinic_id){
+          if(service_name && service_price && uid && clinic_id && service_duration){
 
             var newServiceRef = servicesRef.push();
 
@@ -237,7 +252,8 @@ var uid = null;
               name : service_name,
               price : service_price,
               uid : uid,
-              clinic_id : clinic_id
+              clinic_id : clinic_id,
+              time : service_duration 
             }).then(function(){
 
               var serviceKey = newServiceRef.key;
@@ -259,11 +275,13 @@ var uid = null;
         });
 
 
-        function addServiceElement(key, name, price, clinic_id){
+        function addServiceElement(key, name, price, duration, clinic_id){
 
+          var time = duration ? parseInt(duration) : 0;
           var tr =  $('<tr>').attr('id', key).data('id', key).data('clinic_id', clinic_id)
                 .append( $('<td>').text(name) )
                 .append( $('<td>').text(price) )
+                .append( $('<td>').data('duration', time).text(time+" mins") )
                 .append( $('<td>').addClass('clinic') )
                 .append( $('<td>').addClass('actions')
                   .append( $('<i>').addClass('material-icons edit').text('mode_edit').css('width', '50%') )
@@ -342,7 +360,7 @@ var uid = null;
                         var key = Object.keys(dataList)[i - 1];
                         var val = dataList[key];
                         if(key && val){
-                          addServiceElement(key, val.name, val.price, val.clinic_id );
+                          addServiceElement(key, val.name, val.price, val.time, val.clinic_id );
                           //addClinicElement(data.key, data.val().name, data.val().address );
                         }
                         
@@ -400,6 +418,7 @@ var uid = null;
             $('#edit_service_id').val(service_key);
             $('#edit_service_name').val($(tr).find('td').eq(0).text());
             $('#edit_service_price').val($(tr).find('td').eq(1).text());
+            $('#edit_service_duration').val($(tr).find('td').eq(2).data('duration'));
             $('#editServiceSelectClinic').val(clinic_id);
             $('#editService').modal('open');
             $('#editServiceSelectClinic').material_select();
@@ -412,9 +431,10 @@ var uid = null;
             var edit_service_id = $('#edit_service_id').val();
             var edit_service_name = $('#edit_service_name').val();
             var edit_service_price = $('#edit_service_price').val();
+            var edit_service_duration = $('#edit_service_duration').val();
             var edit_clinic_id = $('#editServiceSelectClinic').val();
             if(edit_service_id){
-              servicesRef.child(edit_service_id).update({ name : edit_service_name, price : edit_service_price, clinic_id : edit_clinic_id });
+              servicesRef.child(edit_service_id).update({ name : edit_service_name, price : edit_service_price, time : edit_service_duration, clinic_id : edit_clinic_id });
               clin
             }
 

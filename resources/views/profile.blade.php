@@ -163,7 +163,7 @@ var uid = null;
   var toastDuration = 3000;
   var storageRef = firebase.storage().ref();
 
-  var usersRef = database.ref('users');
+  var usersRef = database.ref('booking').child('users');
 
   $(document).on('ready', function(){
 
