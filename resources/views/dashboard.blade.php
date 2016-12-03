@@ -119,7 +119,75 @@
      <a href="#!" class="waves-effect waves-green btn-flat" id="delete">Delete</a> 
     </div>
   </div>
-          
+   
+
+   <!-- Modal Structure -->
+  <div id="doctor_modal" class="modal modal-fixed-footer">
+    <div class="modal-content">
+       <!-- <div class="input-field col s12" id="input-clinics">
+	      <select id="doctor_clinic">
+	      <option value="" disabled selected>Choose Clinic</option>
+	      <option value="1">Clinic 1</option>
+	      <option value="2">Clinic 2</option>
+	      <option value="3">Clinic 3</option>
+	    </select>
+   		 <label>DENTAL CLINIC</label> 
+      </div>
+ -->
+       <div class="input-field col s12" id="input-services">
+	      <select id="doctor_services">
+	      <option value="" disabled selected>Choose Services</option>
+	      <option value="1">Service 1</option>
+	      <option value="2">Service 2</option>
+	      <option value="3">Service 3</option>
+	    </select>
+   		 <label>SERVICES</label> 
+      </div>
+      	<div class="inupt-field col s12">
+      	
+      	</div>
+       	 <div class="input-field col s6">
+          <input id="doctor_price" type="text" class="validate">
+         <!--  <label for="price">PRICE</label> -->
+        </div>
+        <span id="schedule_error"></span>
+        <div class="input-field col s6">
+          <input id="doctor_duration_time" type="text">
+        </div>
+
+       <div class="input-field col s6">
+            <span id="day"></span>
+        </div>
+
+        <div class="input-field col s6">
+          <input id="doctor_schedule_time" type="time">
+        </div>
+
+         <div class="input-field col s6">
+          <input id="doctor_name" type="text">
+        </div>
+
+         <div class="input-field col s6">
+          <input id="doctor_number" type="number">
+        </div>
+
+        <div class="input-field col s12">
+          <textarea id="doctor_address"  required=""></textarea>
+          <label for="doctor_address">ADDRESS</label>
+        </div>
+
+        <div class="input-field col s12">
+          <textarea id="doctor_notes" class="materialize-textarea" required=""></textarea>
+          <label for="notes">NOTES</label>
+        </div>
+
+    </div>
+    <div class="modal-footer bottom-button">
+     <a href="#!" class="waves-effect waves-green btn-flat" id="doctor_submit">Submit</a>
+     <a href="#!" class="waves-effect waves-green btn-flat" id="doctor_btn_cancel">Cancel</a> 
+     <a href="#!" class="waves-effect waves-green btn-flat" id="doctor_delete">Delete</a> 
+    </div>
+  </div>      
   
 </div>
 

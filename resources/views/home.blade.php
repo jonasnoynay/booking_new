@@ -75,7 +75,7 @@
 <!-- Modal Structure -->
   <div id="modal1" class="modal modal-fixed-footer">
     <div class="modal-content">
-       <div class="input-field col s12" id="input-clinics">
+       <!-- <div class="input-field col s12" id="input-clinics">
 	      <select id="clinic">
 	      <option value="" disabled selected>Choose Clinic</option>
 	      <option value="1">Clinic 1</option>
@@ -83,7 +83,7 @@
 	      <option value="3">Clinic 3</option>
 	    </select>
    		 <label>DENTAL CLINIC</label> 
-      </div>
+      </div> -->
 
        <div class="input-field col s12" id="input-services">
 	      <select id="services">
@@ -104,7 +104,7 @@
           <input id="price" type="number" class="validate">
         </div>
        	 <div class="input-field col s6">
-          <input id="duration" type="number" class="validate">
+          <input id="duration_time" type="text" class="validate">
         </div>
         <span id="schedule_error"></span>
 
@@ -113,36 +113,76 @@
         </div>
         <div class="input-field col s6">
           <div class="input-field col s4">
-          	 <select>
-	      		<option value="" disabled selected>00</option>
-			      <option value="1">01</option>
-			      <option value="2">02</option>
-			      <option value="3">03</option>
-			      <option value="4">04</option>
-			      <option value="5">05</option>
-			      <option value="6">06</option>
-			      <option value="7">07</option>
-			      <option value="8">08</option>
-			      <option value="9">09</option>
-			      <option value="10">10</option>
-			      <option value="11">11</option>
-			      <option value="12">12</option>
-			    </select>
+          	 <select id="schedule_time">
+      			 <optgroup label="AM Schedules">
+				      <option>01:00 am</option>
+				      <option>01:30 am</option>
+				      <option>02:00 am</option>
+				      <option>02:30 am</option>
+				      <option>03:00 am</option>
+				      <option>03:30 am</option>
+				      <option>04:00 am</option>
+				      <option>04:30 am</option>
+				      <option>05:00 am</option>
+				      <option>05:30 am</option>
+				      <option>06:00 am</option>
+				      <option>06:30 am</option>
+				      <option>07:00 am</option>
+				      <option>07:30 am</option>
+				      <option>08:00 am</option>
+				      <option>08:30 am</option>
+				      <option>09:00 am</option>
+				      <option>09:30 am</option>
+				      <option>10:00 am</option>
+				      <option>10:30 am</option>
+				      <option>11:00 am</option>
+				      <option>11:30 am</option>
+				      <option>12:00 am</option>
+				      <option>12:30 am</option>
+			     </optgroup>
+			     <optgroup label="PM Schedules">
+			     	  <option>01:00 pm</option>
+				      <option>01:30 pm</option>
+				      <option>02:00 pm</option>
+				      <option>02:30 pm</option>
+				      <option>03:00 pm</option>
+				      <option>03:30 pm</option>
+				      <option>04:00 pm</option>
+				      <option>04:30 pm</option>
+				      <option>05:00 pm</option>
+				      <option>05:30 pm</option>
+				      <option>06:00 pm</option>
+				      <option>06:30 pm</option>
+				      <option>07:00 pm</option>
+				      <option>07:30 pm</option>
+				      <option>08:00 pm</option>
+				      <option>08:30 pm</option>
+				      <option>09:00 pm</option>
+				      <option>09:30 pm</option>
+				      <option>10:00 pm</option>
+				      <option>10:30 pm</option>
+				      <option>11:00 pm</option>
+				      <option>11:30 pm</option>
+				      <option>12:00 pm</option>
+				      <option>12:30 pm</option>
+			     </optgroup>
+		    </select>
+			<label> Time </label>
 		    </div>
-          	   <div class="input-field col s4">
+          	  <!--  <div class="input-field col s4">
           	 <select>
 	      		<option value="0" selected>00</option>
 			      <option value="15">15</option>
 			      <option value="30">30</option>
 			      <option value="45">45</option>
 			    </select>
-		    </div>
-		    <div class="input-field col s4">
-		    	<input name="ampm" type="radio" id="am" checked />
+		    </div> -->
+		   <!--  <div class="input-field col s4">
+		    	<input name="ampm" type="radio" id="am" value="am" class="ampm"checked />
       			<label for="am">AM</label>
-		    	<input name="ampm" type="radio" id="pm" />
+		    	<input name="ampm" type="radio" id="pm" value="pm" class="ampm"/>
       			<label for="pm">PM</label>
-		    </div>
+		    </div> -->
         </div>
         <div class="input-field col s12">
           <textarea id="notes" class="materialize-textarea" required=""></textarea>
