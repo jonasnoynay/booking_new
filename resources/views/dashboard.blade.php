@@ -474,6 +474,9 @@ body{
 		.nopadding{
 			padding: 0!important;
 		}
+		#input-clinics{
+			display: none;
+		}
 	</style>
 @endsection
 
@@ -557,7 +560,7 @@ body{
    <!-- Modal Structure -->
   <div id="modal1" class="modal modal-fixed-footer">
     <div class="modal-content">
-       <div class="input-field col s12" id="input-clinics">
+       <div class="input-field col s12" id="input-clinics-2">
 	      <select id="clinic">
 	      <option value="" disabled selected>Choose Clinic</option>
 	      <option value="1">Clinic 1</option>
@@ -612,7 +615,7 @@ body{
  <!-- Modal Structure -->
   <div id="doctor_modal" class="modal modal-fixed-footer">
     <div class="modal-content">
-       <!-- <div class="input-field col s12" id="input-clinics">
+       <div class="input-field col s12" id="input-clinics">
 	      <select id="doctor_clinic">
 	      <option value="" disabled selected>Choose Clinic</option>
 	      <option value="1">Clinic 1</option>
@@ -621,7 +624,7 @@ body{
 	    </select>
    		 <label>DENTAL CLINIC</label> 
       </div>
- -->
+
        <div class="input-field col s12" id="input-services">
 	      <select id="doctor_services">
 	      <option value="" disabled selected>Choose Services</option>
