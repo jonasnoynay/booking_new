@@ -477,6 +477,29 @@ body{
 		#input-clinics{
 			display: none;
 		}
+		 label {
+            width: 100%;
+        }
+        label:after {
+            -moz-transition-property: all !important;
+            -o-transition-property: all !important;
+            -webkit-transition-property: all !important;
+            transition-property: all !important;
+            font-size: 0.8rem;
+            -moz-transform: none;
+            -ms-transform: none;
+            -o-transform: none;
+            -webkit-transform: none;
+            transform: none;
+        }
+
+        label:not(.active):after {
+            -moz-transform: translateY(-140%);
+            -ms-transform: translateY(-140%);
+            -o-transform: translateY(-140%);
+            -webkit-transform: translateY(-140%);
+            transform: translateY(-140%);
+        }
 	</style>
 @endsection
 
@@ -615,42 +638,72 @@ body{
  <!-- Modal Structure -->
   <div id="doctor_modal" class="modal modal-fixed-footer">
     <div class="modal-content">
-       <div class="input-field col s12" id="input-clinics">
-	      <select id="doctor_clinic">
-	      <option value="" disabled selected>Choose Clinic</option>
-	      <option value="1">Clinic 1</option>
-	      <option value="2">Clinic 2</option>
-	      <option value="3">Clinic 3</option>
-	    </select>
-   		 <label>DENTAL CLINIC</label> 
-      </div>
 
-       <div class="input-field col s12" id="input-services">
-	      <select id="doctor_services">
-	      <option value="" disabled selected>Choose Services</option>
-	      <option value="1">Service 1</option>
-	      <option value="2">Service 2</option>
-	      <option value="3">Service 3</option>
-	    </select>
-   		 <label>SERVICES</label> 
-      </div>
-      	<div class="inupt-field col s12">
-      	
-      	</div>
-       	 <div class="input-field col s6">
-          <input id="doctor_price" type="text" class="validate">
-         <!--  <label for="price">PRICE</label> -->
-        </div>
-        <span id="schedule_error"></span>
-        <div class="input-field col s6">
-          <input id="doctor_duration_time" type="text">
-        </div>
+    	<p class="modalSectionTitle"> Booking Details </p>
 
-       <div class="input-field col s6">
-            <span id="doctor_day"></span>
-        </div>
+<!--     	<div class="row">
+      		<div class="input-field" style="margin-top: 0;">
+	          <div class="input-field" id="input-clinics" style="margin-top: 0;">
+	          	 <i class="material-icons prefix">subject</i>	
+		          <i class="material-icons prefix">subject</i>	
+			       <select id="clinic">
+				      <option value="" disabled selected>Choose Clinic</option>
+				      <option value="1">Clinic 1</option>
+				      <option value="2">Clinic 2</option>
+				      <option value="3">Clinic 3</option>
+				    </select>
+			     <label for="login_username"> Clinic </label>
+		      </div>
+		     </div>  
+	   </div>
+ -->
+ 		<form id="doctor_form">
+	   	<div class="row">
+	       	<div class="input-field" style="margin-top: 0;">
+	          <div class="input-field col s12" id="input-services">
+		          <i class="material-icons prefix">subject</i>	
+			      <select id="doctor_services">
+				      <option value="" disabled selected>Choose Services</option>
+				      <option value="1">Service 1</option>
+				      <option value="2">Service 2</option>
+				      <option value="3">Service 3</option>
+				    </select>
+			     <label for="login_username"> Services </label>
+		      </div>
+	         
+	        </div>
+	    </div>
 
-         <div class="col l6">
+	   <div class="row">
+	      		<div class="col l6">
+			       	<div class="input-field">
+						<span id="schedule_error"></span>
+						<i class="material-icons prefix">credit_card</i>
+						<input  id="doctor_price" type="number" placeholder="0.00" class="validate">
+						<label> Price </label>
+			        </div>
+			    </div>
+			    <div class="col l6">
+			       	<div class="input-field">
+			       		 <span id="schedule_error"></span>
+			       		<i class="material-icons prefix">schedule</i>
+						<input  id="doctor_duration_time" placeholder="00:00" type="text">
+						<label> Duration </label>
+			        </div>
+			    </div>
+	    </div>
+
+
+  		 <div class="row">
+	      		<div class="col l6">
+			       	<div class="input-field">
+						<span id="doctor_day"></span> 
+						<i class="material-icons prefix">today</i>
+						<input type="text" id="day" placeholder=" " style="pointer-events:none;margin-top: -6px!important;">
+						<label> Day </label>
+			        </div>
+			    </div>
+			    <div class="col l6">
 			       	<div class="input-field">
 			       		<i class="material-icons prefix">schedule</i>
 						<select id="doctor_schedule_time">
@@ -706,31 +759,58 @@ body{
 						<label> Time </label>
 			        </div>
 			    </div>
+	      </div>
 
-         <div class="input-field col s6">
-          <input id="doctor_name" type="text">
-        </div>
+	      <p class="modalSectionTitle"> Patient Details </p>
 
-         <div class="input-field col s6">
-          <input id="doctor_number" type="number">
-        </div>
+	      <div class="row">
+	      		<div class="col l6">
+			       	<div class="input-field">
+						<span id="schedule_error"></span>
+						<i class="material-icons prefix">account_circle</i>
+						<input  id="doctor_name" type="text" placeholder=" " name="doctor_name">
+						<label> Patient Name </label>
+			        </div>
+			    </div>
+			    <div class="col l6">
+			       	<div class="input-field">
+			       		 <span id="schedule_error"></span>
+			       		<i class="material-icons prefix">phone</i>
+						<input  id="doctor_number" placeholder=" " type="text" name="doctor_number">
+						<label> Patient Contact </label>
+			        </div>
+			    </div>
+	    </div>
 
-        <div class="input-field col s12">
-          <textarea id="doctor_address"  required=""></textarea>
-          <label for="doctor_address">ADDRESS</label>
-        </div>
+	    <div class="row">
+      		<div class="col l12">
+				<div class="input-field">
+				  <i class="material-icons prefix">location_on</i>
+		          <textarea id="doctor_address" required="" placeholder=" " class="materialize-textarea" name="doctor_address"></textarea>
+		          <label for="doctor_address"> Patient Address </label>
+		        </div>
+      		</div>
+	    </div>
 
-        <div class="input-field col s12">
-          <textarea id="doctor_notes" class="materialize-textarea" required=""></textarea>
-          <label for="notes">NOTES</label>
-        </div>
+
+      
+	    <div class="row" style="margin-top: 20px;">
+      		<div class="col l12">
+		        <div class="input-field">
+		          <textarea id="doctor_notes" class="materialize-textarea" placeholder=" " required="" name="doctor_notes"></textarea>
+		          <label for="notes"> Notes </label>
+		        </div>
+		    </div>
+		</div>
 
     </div>
     <div class="modal-footer bottom-button">
-     <a href="#!" class="waves-effect waves-green btn-flat" id="doctor_submit">Submit</a>
+    <!--  <a href="#!" class="waves-effect waves-green btn" id="doctor_submit">Submit</a> -->
+     <button type="submit" class="waves-effect waves-light btn-flat">Submit</button>
      <a href="#!" class="waves-effect waves-green btn-flat" id="doctor_btn_cancel">Cancel</a> 
      <a href="#!" class="waves-effect waves-green btn-flat" id="doctor_delete">Delete</a> 
     </div>
+	</form>
   </div>      
 
    <div id="doctor_modal" class="modal modal-fixed-footer">
@@ -743,6 +823,9 @@ body{
       <a href="#!" class="waves-effect waves-green btn-flat" id="delete_doctor">Delete</a> 
     </div>
   </div>       
+
+
+   
 
          
   
@@ -782,6 +865,7 @@ body{
 
 	<script type="text/javascript" src="{{ asset('js/moment.min.js') }}"></script>
 	<script type="text/javascript" src="{{ asset('js/fullcalendar.min.js') }}"></script>
+	<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.js"></script>
 	<script type="text/javascript" src="{{ asset('js/booking.js') }}"></script>
 	
 	<script>

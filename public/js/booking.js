@@ -7,6 +7,7 @@ var servicesRef = bookingRef.child("services");
 var usersRef = bookingRef.child('users');
 var scheduleRef = bookingRef.child('schedule');
 var calendar;
+var sample_data;
 
 var CLINIC_ID = "-KXUF5KYT-nScKv5qjNu";
 //NEED TO MODIFY THIS ID
@@ -850,110 +851,116 @@ function eventClickFuncDoctor(event, jsEvent, view, revertFunc){
 						//$('#clinic option:selected').text(2);
 			        	//$('#services option:selected').text(2);
 			        	//GETTING THE VALUE AND THE SUBMIT BUTTON FOR UPDATE
-			        	$('#doctor_submit').unbind().on("click",function(){
-			        		var price, moment, start_value, end_value, notes, clinic, service, duration_time, schedule_time, allDay, currentKey, original_title, clinic_id, patient_name, patient_number, patient_address;
-			        		original_title = event.title;
-			        		clinic = $('#clinic option:selected').text();
-			        	 	service = $('#services option:selected').text();
-			        	 
+			        	     
+			        	$('#doctor_form').on('submit', function(e){
+			        		e.preventDefault();
+			        		//alert("Hello");
+				        	}).validate({
+				        		rules: {
+				        			doctor_name: {
+				        				required: true,
+				        				minlength: 3
+				        			},
+				        			doctor_address: {
+				        				required: true,
+				        				minlength: 3
+				        			},
+				        			doctor_number: {
+				        				required: true,
+				        				minlength: 3
+				        			},
+				        			doctor_notes: {
+				        				required: true,
+				        				minlength: 3
+				        			},
+				        			doctor_price: "required",
+				        			doctor_duration_time: "required"
+				        		},
+				        		messages: {
+				        			doctor_name: {
+				        				required: "Please enter patient name",
+				        				minlength: "Patient name must be at least 3 characters long"
+				        			},
+				        			doctor_address: {
+				        				required: "Please enter patient address",
+				        				minlength: "Patient addres must be at least 3 characters long"
+				        			},
+				        			doctor_number: {
+				        				required: "Please enter patient number",
+				        				minlength: "Patient number must be at least 4 characters long"
+				        			},
+				        			doctor_notes: {
+				        				required: "Please enter notes",
+				        				minlength: "Note must be at least 4 characters long"
+				        			},
+				        			doctor_price: "Please enter price",
+				        			doctor_duration_time: "Please enter duration time"
+				        		},
+				        		errorClass: 'invalid',
+							    errorPlacement: function (error, element) {
+							          element.next("label").attr("data-error", error.contents().text());
+							      },
+							    submitHandler : function(form) {
+							    	var price, moment, start_value, end_value, notes, clinic, service, duration_time, schedule_time, allDay, currentKey, original_title, clinic_id, patient_name, patient_number, patient_address;
+					        		original_title = event.title;
+					        		clinic = $('#clinic option:selected').text();
+					        	 	service = $('#services option:selected').text();
+					        	 
 
-			        	 	schedule_time = $('#schedule_time').val();
-			        	 	duration_time = $('#doctor_duration_time').val();
-			        	 	schedule_time = $('#doctor_schedule_time').val();
-			        	 	//console.log('schedule_time '+schedule_time);
-			        	 	
+					        	 	schedule_time = $('#schedule_time').val();
+					        	 	duration_time = $('#doctor_duration_time').val();
+					        	 	schedule_time = $('#doctor_schedule_time').val();
+					        	 	//console.log('schedule_time '+schedule_time);
+					        	 	
 
-			        	 	var service_name = $('#doctor_services option:selected').text();
-							var service_id = $('#doctor_services option:selected').attr('service_id');
-							var clinic_id  = $('#doctor_clinic option:selected').attr('value');
-							var clinic_name = $('#doctor_clinic option:selected').text();
-							notes = $('#doctor_notes').val();
-							patient_name = $('#doctor_name').val();
-							patient_address = $('#doctor_address').val();
-							patient_number = $('#doctor_number').val();
-							//console.log(patient_address+" "+patient_number+" "+patient_name);
-							//console.log("service name"+service_name+" service id"+service_id+" CLINIC_ID "+CLINIC_ID+" CLINIC_ID NAME "+clinic_name);
+					        	 	var service_name = $('#doctor_services option:selected').text();
+									var service_id = $('#doctor_services option:selected').attr('service_id');
+									var clinic_id  = $('#doctor_clinic option:selected').attr('value');
+									var clinic_name = $('#doctor_clinic option:selected').text();
+									notes = $('#doctor_notes').val();
+									patient_name = $('#doctor_name').val();
+									patient_address = $('#doctor_address').val();
+									patient_number = $('#doctor_number').val();
+									//console.log(patient_address+" "+patient_number+" "+patient_name);
+									//console.log("service name"+service_name+" service id"+service_id+" CLINIC_ID "+CLINIC_ID+" CLINIC_ID NAME "+clinic_name);
 
-			        	 	//var price_value = $('#services option:selected').attr("price");			  
-			        	 	
-			        	 	price = $("#doctor_price").val();
-
-
-
-				        	
-				        	var start_date = event.start.format()+"T"+duration_time;
-				        	//START VALUE SETTING TIME
-				        	//start_value = start.format("MM/DD/YYYY hh:mm");
-				        	start_value = event.start.format("MM/DD/YYYY");
-				        	start_value = start_value+" "+schedule_time;
-
-				        	//console.log('setting data');
-				        	//console.log(start_value);
-				        	//notes = $('#notes').val();
-
-				        	event.end = $.fullCalendar.moment(start_value);
-						    event.end.add(duration_time, 'minutes');
-						    end_value = event.end.format("MM/DD/YYYY hh:mm a");
+					        	 	//var price_value = $('#services option:selected').attr("price");			  
+					        	 	
+					        	 	price = $("#doctor_price").val();
 
 
-				        	if(notes.length == 0) {				        	
-								Materialize.toast('Empty Notes!', 3000, 'rounded');
-				        	}
-				        	else if(service_name.length == 0) {
-								Materialize.toast('Empty Services!', 3000, 'rounded');
-				        	}
-				        	else if(price.length == 0) {
-								Materialize.toast('Empty Price!', 3000, 'rounded');
-				        	}
-				        	else if(patient_name.length == 0) {
-								Materialize.toast('Empty Name!', 3000, 'rounded');
-				        	}
-				        	else if(patient_number.length == 0) {
-								Materialize.toast('Empty Number!', 3000, 'rounded');
-				        	} 
-				        	else if(patient_address.length == 0) {
-								Materialize.toast('Empty Address!', 3000, 'rounded');
-				        	} 
-				        	else {
-				        		//$('#calendar').fullCalendar('removeEvents', event._id);
-					        	//SETTING THE DATA FOR FULLCALENDAR
-					        	/*var newEvent = {
-						                //start: '2016-11-22T12:30:00',
-						                start: start_value,
-						                end: end_value,
-						                allDay: false,
-						                title: notes,
-						                clinic: clinic_name,
-						                service: service,
-						                duration_time: duration_time,
-						                schedule_time: schedule_time,
-						                color: '#ccc',
-						                price: price,
-						                clinic_id: clinic_id,
-						                service_id: service_id,
-						                patient_name: patient_name,
-						                patient_address: patient_address,
-						                patient_number: patient_number
-						                //id: currentKey
-						            };
-					        	$('#calendar').fullCalendar('renderEvent', newEvent,true);*/
-					        	//UPDATE FIREBASE DATABASE
 
-					        	//revertChanges("", notes, start_value, end_value, search_clinic, service_id, duration_time, schedule_time, price, original_title);
-					        	var id = event.id;
-					        	if(id == "") {
-					        		//NEED TO MODIFY
-					        		revertChangesDoctor("", notes, start_value, end_value, CLINIC_ID, service_id, duration_time, schedule_time, price, original_title, patient_name, patient_number, patient_address);
-					        	} 
-					        	else {
-					        		revertChangesDoctor(id, notes, start_value, end_value, CLINIC_ID, service_id, duration_time, schedule_time, price, original_title, patient_name, patient_number, patient_address);
-					        	}
-					        	clear();
-					        	$('.modal').modal('close');
-					        	clear();
-								getClinics();
-				        	}//END OF VALIDATION FOR NULL IMPUT 			     
+						        	
+						        	var start_date = event.start.format()+"T"+duration_time;
+						        	//START VALUE SETTING TIME
+						        	//start_value = start.format("MM/DD/YYYY hh:mm");
+						        	start_value = event.start.format("MM/DD/YYYY");
+						        	start_value = start_value+" "+schedule_time;
 
+						        	//console.log('setting data');
+						        	//console.log(start_value);
+						        	//notes = $('#notes').val();
+
+						        	event.end = $.fullCalendar.moment(start_value);
+								    event.end.add(duration_time, 'minutes');
+								    end_value = event.end.format("MM/DD/YYYY hh:mm a");
+
+							    	var id = event.id;
+						        	if(id == "") {
+						        		//NEED TO MODIFY
+						        		revertChangesDoctor("", notes, start_value, end_value, CLINIC_ID, service_id, duration_time, schedule_time, price, original_title, patient_name, patient_number, patient_address);
+						        	} 
+						        	else {
+						        		revertChangesDoctor(id, notes, start_value, end_value, CLINIC_ID, service_id, duration_time, schedule_time, price, original_title, patient_name, patient_number, patient_address);
+						        	}
+						        	clear();
+						        	$('.modal').modal('close');
+						        	clear();
+									getClinics();
+									Materialize.toast('Successfully Updated!', 3000, 'rounded');
+							    	//alert("successfully");
+							    	return false;
+							    }
 				        	
 
 			        	});
@@ -961,6 +968,7 @@ function eventClickFuncDoctor(event, jsEvent, view, revertFunc){
 						$('#doctor_btn_cancel').on('click', function(){
 							//$('#clinic').html('');
 							$('#doctor_modal').modal('close');
+							$("#doctor_form").validate().resetForm();
 							/*$('#clinic').html('');
 								$('#clinic').append($("<option></option>").attr("value",1).attr("id","clinic").text("Select Clinic"));
 								$("select").material_select('update');*/
@@ -1292,80 +1300,101 @@ function selectDayNoClinic(start, end, jsEvent, view){
 			        	$('#doctor_btn_cancel').on('click', function(){
 								$('#doctor_modal').modal('close');
 								clear();
+								$("#doctor_form").validate().resetForm();
 							});
 			        	
-			        	 $('#doctor_submit').unbind().click(function(){
+			        	$('#doctor_form').on('submit', function(e){
+			        		e.preventDefault();
+			        		//alert("Hello");
+			        	}).validate({
+			        		rules: {
+			        			doctor_name: {
+			        				required: true,
+			        				minlength: 3
+			        			},
+			        			doctor_address: {
+			        				required: true,
+			        				minlength: 3
+			        			},
+			        			doctor_number: {
+			        				required: true,
+			        				minlength: 3
+			        			},
+			        			doctor_notes: {
+			        				required: true,
+			        				minlength: 3
+			        			},
+			        			doctor_price: "required",
+			        			doctor_duration_time: "required"
+			        		},
+			        		messages: {
+			        			doctor_name: {
+			        				required: "Please enter patient name",
+			        				minlength: "Patient name must be at least 3 characters long"
+			        			},
+			        			doctor_address: {
+			        				required: "Please enter patient address",
+			        				minlength: "Patient addres must be at least 3 characters long"
+			        			},
+			        			doctor_number: {
+			        				required: "Please enter patient number",
+			        				minlength: "Patient number must be at least 4 characters long"
+			        			},
+			        			doctor_notes: {
+			        				required: "Please enter notes",
+			        				minlength: "Note must be at least 4 characters long"
+			        			},
+			        			doctor_price: "Please enter price",
+			        			doctor_duration_time: "Please enter duration time"
+			        		},
+			        		errorClass: 'invalid',
+						    errorPlacement: function (error, element) {
+						          element.next("label").attr("data-error", error.contents().text());
+						      },
+						    submitHandler : function(form) {
+						    	var price, moment, start_value, end_value, notes, clinic, service, duration_time, schedule_time, allDay, currentKey, patient_name, patient_address, patient_number;
+				        	 	//clinic = $('#clinic option:selected').text();
+				        	 	//service = $('#services option:selected').text();
+				        	 	duration_time = $('#doctor_duration_time').val();
+				        	 	schedule_time = $('#doctor_schedule_time').val();
+				        	 	//console.log('schedule_time '+schedule_time);
+				        	 	
 
-			        	 	var price, moment, start_value, end_value, notes, clinic, service, duration_time, schedule_time, allDay, currentKey, patient_name, patient_address, patient_number;
-			        	 	//clinic = $('#clinic option:selected').text();
-			        	 	//service = $('#services option:selected').text();
-			        	 	duration_time = $('#doctor_duration_time').val();
-			        	 	schedule_time = $('#doctor_schedule_time').val();
-			        	 	//console.log('schedule_time '+schedule_time);
-			        	 	
+				        	 	var service_name = $('#doctor_services option:selected').text();
+								var service_id = $('#doctor_services option:selected').attr('service_id');
+								var clinic_id  = $('#doctor_clinic option:selected').attr('value');
+								var clinic_name = $('#doctor_clinic option:selected').text();
+								notes = $('#doctor_notes').val();
+								patient_name = $('#doctor_name').val();
+								patient_address = $('#doctor_address').val();
+								patient_number = $('#doctor_number').val();
+								//console.log(doctor_number+""+doctor_address+""+doctor_name);
 
-			        	 	var service_name = $('#doctor_services option:selected').text();
-							var service_id = $('#doctor_services option:selected').attr('service_id');
-							var clinic_id  = $('#doctor_clinic option:selected').attr('value');
-							var clinic_name = $('#doctor_clinic option:selected').text();
-							notes = $('#doctor_notes').val();
-							patient_name = $('#doctor_name').val();
-							patient_address = $('#doctor_address').val();
-							patient_number = $('#doctor_number').val();
-							//console.log(doctor_number+""+doctor_address+""+doctor_name);
+				        	 	//var price_value = $('#services option:selected').attr("price");			  
+				        	 	
+				        	 	price = $("#doctor_price").val();
+					        	moment = $('#calendar').fullCalendar('getDate');
+					        	allDay = $('#allDay').val();
 
-			        	 	//var price_value = $('#services option:selected').attr("price");			  
-			        	 	
-			        	 	price = $("#doctor_price").val();
-				        	moment = $('#calendar').fullCalendar('getDate');
-				        	allDay = $('#allDay').val();
+					        	//console.log("servive name"+service_name+""+service_id+""+clinic_id+"clinic name "+clinic_name+""+duration_time+""+schedule_time+""+notes);				      
+					        	//variable for all day
+					        	
+					        	
+					        	var start_date = start.format()+"T"+duration_time;
+					        	//START VALUE SETTING TIME
+					        	//start_value = start.format("MM/DD/YYYY hh:mm");
+					        	start_value = start.format("MM/DD/YYYY");
+					        	start_value = start_value+" "+schedule_time;
 
-				        	//console.log("servive name"+service_name+""+service_id+""+clinic_id+"clinic name "+clinic_name+""+duration_time+""+schedule_time+""+notes);				      
-				        	//variable for all day
-				        	
-				        	
-				        	var start_date = start.format()+"T"+duration_time;
-				        	//START VALUE SETTING TIME
-				        	//start_value = start.format("MM/DD/YYYY hh:mm");
-				        	start_value = start.format("MM/DD/YYYY");
-				        	start_value = start_value+" "+schedule_time;
-
-				        	//console.log('setting data');
-				        	//console.log(start_value);
-				        	
-				        	//end = $.fullCalendar.moment(start_value);
-				        	
-				        	end = $.fullCalendar.moment(end.format('MM/DD/YYYY')+" "+schedule_time);
-				        	end.add(duration_time, 'minutes');
-				        	end_value = end.format("MM/DD/YYYY hh:mm a");
-				        	console.log(end_value);
-				        	//CHECK IF THB NOTES IS NULL
-				        	if(notes.length == 0) {				        	
-								Materialize.toast('Empty Notes!', 3000, 'rounded');
-				        	}
-				        	else if(service_name.length == 0) {
-								Materialize.toast('Empty Services!', 3000, 'rounded');
-				        	}
-				        	else if(price.length == 0) {
-								Materialize.toast('Empty Price!', 3000, 'rounded');
-				        	}
-				        	else if(patient_name.length == 0) {
-								Materialize.toast('Empty Name!', 3000, 'rounded');
-				        	}
-				        	else if(patient_number.length == 0) {
-								Materialize.toast('Empty Number!', 3000, 'rounded');
-				        	} 
-				        	else if(patient_address.length == 0) {
-								Materialize.toast('Empty Address!', 3000, 'rounded');
-				        	}  
-				        	/*else if(duration_time.length == 0) {
-								Materialize.toast('Empty Duration Time!', 3000, 'rounded');
-				        	}*/
-				        	/*else if(schedule_time.length == 0) {
-								Materialize.toast('Empty schedule Time!', 3000, 'rounded');
-				        	}*/
-				        	else {
-					            //ADD TO FIREBASE
+					        	//console.log('setting data');
+					        	//console.log(start_value);
+					        	
+					        	//end = $.fullCalendar.moment(start_value);
+					        	
+					        	end = $.fullCalendar.moment(end.format('MM/DD/YYYY')+" "+schedule_time);
+					        	end.add(duration_time, 'minutes');
+					        	end_value = end.format("MM/DD/YYYY hh:mm a");
+					        	 //ADD TO FIREBASE
 					            //SEACH IF VACANT
 						        bookingSearch.child('schedule').orderByChild("start_value").startAt(start_value).endAt(start_value).once('value', function(snapshot){
 					        		if(snapshot.val() == null) {
@@ -1396,15 +1425,18 @@ function selectDayNoClinic(start, end, jsEvent, view){
 						            	//add(price, start_value, end_value, notes, search_clinic, services_key, duration_time, schedule_time);
 						            	addDoctor(price, start_value, end_value, notes, CLINIC_ID, service_id, duration_time, schedule_time, patient_name, patient_address, patient_number);
 						            	$('#doctor_modal').modal('close');
+						            	Materialize.toast('Successfully Added!', 3000, 'rounded');
 						            	clear();
 									}
 									else {
 										alert("No Vacant. "+start_value);
 													
 									}
-					        	});				    			        
-				        	}
-			        	 });
+					        	});				    			       
+						    	return false;
+						    }
+
+			        	});
 
 			        	}else{
 			        		loginButton = false;

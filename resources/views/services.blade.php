@@ -4,6 +4,31 @@
 
 <div class="row">
   @include('navbar')
+<style>
+label {
+            width: 100%;
+        }
+        label:after {
+            -moz-transition-property: all !important;
+            -o-transition-property: all !important;
+            -webkit-transition-property: all !important;
+            transition-property: all !important;
+            font-size: 0.8rem;
+            -moz-transform: none;
+            -ms-transform: none;
+            -o-transform: none;
+            -webkit-transform: none;
+            transform: none;
+        }
+
+        label:not(.active):after {
+            -moz-transform: translateY(-140%);
+            -ms-transform: translateY(-140%);
+            -o-transform: translateY(-140%);
+            -webkit-transform: translateY(-140%);
+            transform: translateY(-140%);
+        }
+  </style>
 <ul id="doctor-nav" class="side-nav fixed">
     <li><div class="userView">
       <div class="background">
@@ -84,13 +109,13 @@
               </div>
               <div class="row">
                 <div class="input-field">
-                  <input id="service_name" type="text" class="validate">
+                  <input id="service_name" type="text" class="validate" name="service_name">
                   <label for="service_name">Service Name</label>
                 </div>
               </div>
               <div class="row">
                 <div class="input-field">
-                  <input id="service_price" type="text" class="validate">
+                  <input id="service_price" type="text" class="validate" name="service_price">
                   <label for="service_price">Service Price</label>
                 </div>
               </div>
@@ -98,7 +123,7 @@
       </div>
       <div class="modal-footer">
         <a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Cancel</a>
-        <button type="submit" class="modal-action modal-close waves-effect waves-light btn-flat">Submit</button>
+        <button type="submit" class="waves-effect waves-light btn-flat">Submit</button>
       </div>
     </form>
   </div>
@@ -194,6 +219,7 @@ var uid = null;
 
 @section('custom-js')
   <script type="text/javascript" src="{{ asset('js/materialize-pagination.min.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.15.1/jquery.validate.js"></script>
   <script>
 
 
@@ -223,7 +249,7 @@ var uid = null;
         $('#addServiceForm').on('submit', function(e){
           e.preventDefault();
 
-          // Get Data
+         /* // Get Data
           var service_name = $('#service_name').val();
           var service_price = $('#service_price').val();
           var clinic_id = $('#addServiceSelectClinic').val();
@@ -254,8 +280,43 @@ var uid = null;
 
             });
 
-          }
+          }*/
 
+        }).validate({
+           rules: {
+              service_price: {
+                required: true,
+                minlength: 3
+              },
+              service_name: {
+                required: true,
+                minlength: 3
+              }
+
+            },
+            messages: {
+              service_price: {
+                required: "Please enter Clinic name",
+                minlength: "Clinic name must be at least 3 characters long"
+              },
+              service_name: {
+                required: "Please enter Clinic Address",
+                minlength: "Address must be at least 3 characters long"
+              }
+            },
+            errorClass: 'invalid',
+            errorPlacement: function (error, element) {
+                  element.next("label").attr("data-error", error.contents().text());
+              },
+            submitHandler : function(form) {
+              // Get Data
+              var service_name = $('#service_name').val();
+              var service_price = $('#service_price').val();
+              var service_duration = $('#service_duration').val();
+              var clinic_id = $('#addServiceSelectClinic').val();
+              console.log(service_name+" "+service_price+" "+service_duration+" "+clinic_id);
+              return false;
+            } 
         });
 
 
